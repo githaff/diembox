@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <getopt.h>
 
+#define PARSE_ABORT 0
+#define PARSE_PROCEED 1
+
 
 /*
  * Command line options flags
  */
-char opt_exit = 0;
 
 
 void usage(void)
@@ -17,14 +19,21 @@ void usage(void)
 		   "  -h|--help   Print this help\n");
 }
 
-
-int parse_arguments(int argc, char *argv[])
+/*
+ * Parse command line arguments.
+ * Returns PARSE_PROCEED if all ok, PARSE_ABORT --- if app should be
+ * closed (in this case return code will be written to retcode).
+ */
+int parse_arguments(int argc, char *argv[], int *retcode)
 {
 	int c;
 	static struct option long_options[] = {
 		{"help", no_argument, 0, 'h' },
 		{0,      0,           0, 0   }
 	};
+
+	if (retcode)
+		*retcode = 0;
 
 	while (1) {
         int option_index = 0;
@@ -36,11 +45,12 @@ int parse_arguments(int argc, char *argv[])
 		
 		switch (c) {
 		case '?':
-			return 1;
+			if (retcode)
+				*retcode = 1;
+			return PARSE_ABORT;
 		case 'h':
 			usage();
-			opt_exit = 1;
-			return 0;
+			return PARSE_PROCEED;
 		}
 	}
 	
@@ -50,11 +60,10 @@ int parse_arguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	if (parse_arguments(argc, argv))
-		return 1;
-
-	if (opt_exit)
-		return 0;
+	int ret;
 	
+	if (!parse_arguments(argc, argv, &ret))
+		return ret;
+
 	return 0;
 }
