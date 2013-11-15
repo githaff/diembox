@@ -2,11 +2,11 @@
 CC=gcc
 CFLAGS=-Werror -Wpedantic -Wall -Wextra
 
-tobin : main.c
-	$(CC) $(CFLAGS) -o tobin main.c
+ltools : main.c tobin.c
+	$(CC) $(CFLAGS) -o ltools main.c tobin.c
 
 clean :
-	rm -f tobin *~
+	rm -f ltools *~
 
 
 .PHONY : clean
