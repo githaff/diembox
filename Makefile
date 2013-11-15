@@ -2,6 +2,8 @@
 CC=gcc
 CFLAGS=-Werror -Wpedantic -Wall -Wextra
 
+INCLUDES = $(wildcard *.h)
+
 TOOL_SRCS = tobin.c
 TOOL_OBJS = $(TOOL_SRCS:.c=.o)
 OBJ = main.o $(TOOL_OBJS)
@@ -10,7 +12,7 @@ LINKS = $(TOOL_OBJS:.o=)
 
 all : ltools $(LINKS)
 
-%.o : %.c
+%.o : %.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 ltools : $(OBJ)
