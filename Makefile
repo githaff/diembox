@@ -13,19 +13,19 @@ OBJ = $(SRC:.c=.o) $(OBJ_TOOLS)
 LINKS = $(OBJ_TOOLS:.o=)
 
 
-all : ltools $(LINKS)
+all : embox $(LINKS)
 
 %.o : %.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-ltools : $(OBJ)
+embox : $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(LINKS) :
-	ln -s ltools $@
+	ln -s embox $@
 
 clean :
-	rm -f ltools
+	rm -f embox
 	rm -f *.o
 	rm -f $(LINKS)
 	rm -f *~ 

@@ -9,11 +9,11 @@
 #include "usage.h"
 
 
-char ltools_name[] = "ltools";
-int ltools_name_len = sizeof(ltools_name);
-void ltools_usage(void)
+char embox_name[] = "embox";
+int embox_name_len = sizeof(embox_name);
+void embox_usage(void)
 {
-	printf("Usage: ltools [OPTIONS] COMMAND [COMMAND_OPTIONS]\n"
+	printf("Usage: %s [OPTIONS] COMMAND [COMMAND_OPTIONS]\n"
 		   "Embedded developer toolbox.\n"
            "Targeted mainly at aiding embedded low-level programming (but of course\n"
            "can be used by anyone) and implements basic useful tools which perfectly\n"
@@ -23,10 +23,10 @@ void ltools_usage(void)
 		   "Options:\n"
 		   "  -h|--help   Print this help\n"
            "\n"
-           "Commands:\n");
+           "Commands:\n", embox_name);
 }
 
-struct module_opt ltools_opts[] = {
+struct module_opt embox_opts[] = {
     {
         .name_long = "my-arg",
         .name_short = 'h',
@@ -62,14 +62,14 @@ int main(int argc, char *argv[])
 	char *toolname;
 
     printf("Options\n");
-    print_usage(ltools_opts);
+    print_usage(embox_opts);
 
     return 0;
 
 	toolname = basename(argv[0]);
 
-	if (!strncmp(toolname, ltools_name, ltools_name_len)) {
-        ltools_usage();
+	if (!strncmp(toolname, embox_name, embox_name_len)) {
+        embox_usage();
 		return ret;
     }
 	else if (!strncmp(toolname, tobin_name, tobin_name_len))
