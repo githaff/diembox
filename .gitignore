@@ -1,5 +1,10 @@
 # Generated binaries
 ltools
+*.o
+
+# Generated links
+tobin
 
 # Temporary files
 *~
+
