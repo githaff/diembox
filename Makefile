@@ -1,13 +1,16 @@
 
 CC=gcc
-CFLAGS=-Werror -Wpedantic -Wall -Wextra
+CFLAGS=-std=c99 -Werror -Wpedantic -Wall -Wextra
 
 INCLUDES = $(wildcard *.h)
 
-TOOL_SRCS = tobin.c
-TOOL_OBJS = $(TOOL_SRCS:.c=.o)
-OBJ = main.o $(TOOL_OBJS)
-LINKS = $(TOOL_OBJS:.o=)
+SRC = main.o \
+      usage.o
+SRC_TOOLS = tobin.c
+
+OBJ_TOOLS = $(SRC_TOOLS:.c=.o)
+OBJ = $(SRC:.c=.o) $(OBJ_TOOLS)
+LINKS = $(OBJ_TOOLS:.o=)
 
 
 all : ltools $(LINKS)
