@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <libgen.h>
 #include <string.h>
 #include <errno.h>
@@ -26,6 +27,19 @@ void embox_usage(void)
            "Commands:\n", embox_name);
 }
 
+char  opts_help;
+int   opts_some_num;
+char *opts_some_str;
+long int   opts_spec_num;
+void  opts_set(struct extopt *opt, char *arg)
+{
+    (void)opt;
+    
+    printf("Opt set '%s'\n", arg);
+    opts_spec_num = strtol(arg, NULL, 10);
+}
+
+
 struct extopt embox_opts[] = {
     {
         .name_long = "help",
@@ -33,6 +47,31 @@ struct extopt embox_opts[] = {
         .has_arg = no_argument,
         .arg_name = NULL,
         .desc = "print this help",
+        .arg.addr = &opts_help,
+    }, {
+        .name_long = "some-num",
+        .name_short = 'n',
+        .has_arg = required_argument,
+        .arg_name = "NUM",
+        .desc = "specify some number",
+        .arg_type = EXTARG_INT,
+        .arg.addr = &opts_some_num,
+    }, {
+        .name_long = "some-str",
+        .name_short = 's',
+        .has_arg = required_argument,
+        .arg_name = "STR",
+        .desc = "specify some string",
+        .arg_type = EXTARG_STR,
+        .arg.addr = &opts_some_str,
+    }, {
+        .name_long = "some-spec",
+        .name_short = 'c',
+        .has_arg = required_argument,
+        .arg_name = "SPEC",
+        .desc = "specify some string",
+        .arg_type = EXTARG_SPECIAL,
+        .arg.setter = opts_set,
     },
     EXTOPTS_END
 };
@@ -99,6 +138,22 @@ int parse_arguments(int argc, char *argv[])
 	return 0;  
 }
 
+int ext_parse_arguments(int argc, char *argv[])
+{
+    printf(":: help = %d\n", opts_help);
+    printf(":: num = %d\n", opts_some_num);
+    printf(":: str = %s\n", opts_some_str);
+    printf(":: spec = %ld\n", opts_spec_num);
+
+    get_extopt(argc, argv, embox_opts);
+
+    printf(":: help = %d\n", opts_help);
+    printf(":: num = %d\n", opts_some_num);
+    printf(":: str = %s\n", opts_some_str);
+    printf(":: spec = %ld\n", opts_spec_num);
+
+    return 0;
+}
 
 
 int main(int argc, char *argv[])
@@ -112,7 +167,8 @@ int main(int argc, char *argv[])
     printf("Options\n");
     extopts_usage_orig(embox_opts_orig);
 
-    parse_arguments(argc, argv);
+//    parse_arguments(argc, argv);
+    ext_parse_arguments(argc, argv);
     
     return 0;
 

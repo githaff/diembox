@@ -19,6 +19,21 @@
 
 #include <getopt.h>
 
+
+/*
+ * Types of option argument.
+ * Defines the way argument will be written into @arg field of extopt
+ * structure.
+ */
+enum extarg_type {
+    /* Will use default string transforms if needed */
+    EXTARG_STR,
+    EXTARG_INT,
+    EXTARG_CHAR,
+    /* Will call function from pointer in @arg of extopt structure */
+    EXTARG_SPECIAL,
+};
+
 /*
  * Extended option description structure.
  */
@@ -28,7 +43,15 @@ struct extopt {
     int has_arg;
     char *arg_name;
     char *desc;
+    
+    /* Returned argument */
+    enum extarg_type arg_type;
+    union {
+        void *addr;
+        void (*setter)(struct extopt *opt, char *arg);
+    } arg;
 };
+
 
 
 /*
@@ -49,14 +72,16 @@ struct extopt_orig {
 };
 
 
-#define EXTOPTS_END { 0, 0, 0, 0, 0 }
+#define EXTOPTS_END { 0, 0, 0, 0, 0, 0, {0} }
 #define EXTOPTS_ORIG_END { 0, 0, 0, 0, 0, 0, 0 }
 
 
 void extopts_usage(struct extopt *opts);
 void extopts_usage_orig(struct extopt_orig *opts);
 
-int get_extopt_orig(int argc, char * const argv[],
+
+int get_extopt(int argc, char *argv[], struct extopt *opts);
+int get_extopt_orig(int argc, char *const argv[],
                     const char *optstring,
                     struct extopt_orig *opts_orig, int *longindex);
 
@@ -67,7 +92,9 @@ inline static char opt_is_end(struct extopt opt)
            opt.name_short == 0 &&
            opt.has_arg    == 0 &&
            opt.arg_name   == 0 &&
-           opt.desc       == 0;
+           opt.desc       == 0 &&
+           opt.arg_type   == 0 &&
+           opt.arg.addr   == 0;
 }
 
 inline static char opt_orig_is_end(struct extopt_orig opt)
