@@ -34,10 +34,22 @@ struct extopt embox_opts[] = {
         .arg_name = NULL,
         .desc = "print this help",
     },
-    OPTS_END
+    EXTOPTS_END
 };
 
-
+struct extopt_orig embox_opts_orig[] = {
+    {
+        .name = "help",
+        .has_arg = no_argument,
+        .flag = 0,
+        .val = 0,
+        
+        .name_short = 'h',
+        .arg_name = NULL,
+        .desc = "print this help",
+    },
+    EXTOPTS_ORIG_END
+};
 
 
 int main(int argc, char *argv[])
@@ -46,8 +58,11 @@ int main(int argc, char *argv[])
 	char *toolname;
 
     printf("Options\n");
-    print_usage(embox_opts);
+    extopts_usage(embox_opts);
 
+    printf("Options\n");
+    extopts_usage_orig(embox_opts_orig);
+    
     return 0;
 
 	toolname = basename(argv[0]);
