@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <getopt.h>
 
-#include "module.h"
+#include "extopts.h"
 
 
 #define BUF_SIZE 1024
@@ -21,7 +20,7 @@
 char desc_default[] = "no description specified";
 
 
-inline static char opt_is_end(struct module_opt opt)
+inline static char opt_is_end(struct extopt opt)
 {
     return opt.name_long  == 0 &&
            opt.name_short == 0 &&
@@ -33,7 +32,7 @@ inline static char opt_is_end(struct module_opt opt)
 /*
  * Check options for validity.
  */
-inline static int validate_option(struct module_opt *opt)
+inline static int validate_option(struct extopt *opt)
 {
     if (!opt->name_short && !opt->name_long) {
         fprintf(stderr,
@@ -95,7 +94,7 @@ char *get_subline(char *str, char *buf, int size, int buf_size)
 /*
  * Get printed long option name length.
  */
-int get_opt_length(struct module_opt *opt)
+int get_opt_length(struct extopt *opt)
 {
     int len = 0;
 
@@ -121,7 +120,7 @@ int get_opt_length(struct module_opt *opt)
  * option with short name
  * Returns position from which descriptions must be written.
  */
-int get_desc_offset(struct module_opt *opts, char *any_short)
+int get_desc_offset(struct extopt *opts, char *any_short)
 {
     int len, i;
     int len_max = 0;
@@ -164,7 +163,7 @@ int get_desc_offset(struct module_opt *opts, char *any_short)
  * @desc_offset_norm - normal offset with which description will be printed.
  * @any_short - there is at least one option with short name.
  */
-void print_opt(struct module_opt *opt, int desc_offset_norm, char any_short)
+void print_opt(struct extopt *opt, int desc_offset_norm, char any_short)
 {
     char buf[BUF_SIZE];
     int bufsize = BUF_SIZE;
@@ -240,7 +239,7 @@ void print_opt(struct module_opt *opt, int desc_offset_norm, char any_short)
  * before options.
  * @opts - array of options, must end with all-zero struct OPTS_END.
  */
-void print_usage(struct module_opt *opts)
+void print_usage(struct extopt *opts)
 {
     int i;
     int desc_offset;

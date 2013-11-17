@@ -6,7 +6,7 @@
 
 #include "tobin.h"
 #include "module.h"
-#include "usage.h"
+#include "extopts.h"
 
 
 char embox_name[] = "embox";
@@ -21,39 +21,23 @@ void embox_usage(void)
            "to hold it all in one console utility.\n"
 		   "\n"
 		   "Options:\n"
-		   "  -h|--help   Print this help\n"
+		   "  -h|--help   print this help\n"
            "\n"
            "Commands:\n", embox_name);
 }
 
-struct module_opt embox_opts[] = {
+struct extopt embox_opts[] = {
     {
-        .name_long = "my-arg",
+        .name_long = "help",
         .name_short = 'h',
-        .has_arg = optional_argument,
-        .arg_name = "MY_ARG",
-        .desc = "print this  blocks are copied only when modified.  If this is not possible the copy",
-    }, {
-        .name_long = "required-arg",
-        .name_short = 's',
-        .has_arg = required_argument,
+        .has_arg = no_argument,
         .arg_name = NULL,
-        .desc = NULL,
-    }, {
-        .name_long = NULL,
-        .name_short = 'o',
-        .has_arg = no_argument,
-        .arg_name = "",
-        .desc = "print this help\nare\nequivalent. The second style allows repeated references to the  same  argument ",
-    }, {
-        .name_long = "version",
-        .name_short = 0,
-        .has_arg = no_argument,
-        .arg_name = "",
-        .desc = "print this help are equivalent. The second style allows repeated references to the  same  argument The  C99  standard does not include the style using '$', which comes from the Single data blocks are copied only when modified.\nIf this is not possible the copy",
+        .desc = "print this help",
     },
     OPTS_END
 };
+
+
 
 
 int main(int argc, char *argv[])

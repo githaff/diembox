@@ -5,7 +5,8 @@ CFLAGS=-std=c99 -Werror -Wpedantic -Wall -Wextra
 INCLUDES = $(wildcard *.h)
 
 SRC = main.o \
-      usage.o
+      extopts.o \
+      extopts_usage.o
 SRC_TOOLS = tobin.c
 
 OBJ_TOOLS = $(SRC_TOOLS:.c=.o)
