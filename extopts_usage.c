@@ -21,26 +21,6 @@
 char desc_default[] = "no description specified";
 
 
-inline static char opt_is_end(struct extopt opt)
-{
-    return opt.name_long  == 0 &&
-           opt.name_short == 0 &&
-           opt.has_arg    == 0 &&
-           opt.arg_name   == 0 &&
-           opt.desc       == 0;
-}
-
-inline static char opt_orig_is_end(struct extopt_orig opt)
-{
-    return opt.name       == 0 &&
-           opt.has_arg    == 0 &&
-           opt.flag       == 0 &&
-           opt.val        == 0 &&
-           opt.name_short == 0 &&
-           opt.arg_name   == 0 &&
-           opt.desc       == 0;
-}
-
 /*
  * Check options for validity.
  */

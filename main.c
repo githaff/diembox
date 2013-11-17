@@ -52,6 +52,33 @@ struct extopt_orig embox_opts_orig[] = {
 };
 
 
+int parse_arguments(int argc, char *argv[])
+{
+	int c;
+
+	while (1) {
+        int option_index = 0;
+
+		c = get_extopt_orig(argc, argv, "h",
+                            embox_opts_orig, &option_index);
+		if (c == -1)
+			break;
+		
+		switch (c) {
+		case '?':
+            printf("Some error\n");
+			return -EINVAL;
+		case 'h':
+            printf("Found optiont 'h'\n");
+			return 0;
+		}
+	}
+	
+	return 0;  
+}
+
+
+
 int main(int argc, char *argv[])
 {
 	int ret = 0;
@@ -62,6 +89,8 @@ int main(int argc, char *argv[])
 
     printf("Options\n");
     extopts_usage_orig(embox_opts_orig);
+
+    parse_arguments(argc, argv);
     
     return 0;
 
