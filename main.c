@@ -39,15 +39,31 @@ struct extopt embox_opts[] = {
 
 struct extopt_orig embox_opts_orig[] = {
     {
+        .name = "some-req",
+        .has_arg = required_argument,
+        .flag = 0,
+        .val = 'r',
+        .name_short = 'r',
+        .arg_name = "REQ_ARG",
+        .desc = "take some required argument",
+    }, {
         .name = "help",
         .has_arg = no_argument,
         .flag = 0,
         .val = 0,
-        
         .name_short = 'h',
         .arg_name = NULL,
         .desc = "print this help",
+    }, {
+        .name = "some-opt",
+        .has_arg = optional_argument,
+        .flag = 0,
+        .val = 'o',
+        .name_short = 'o',
+        .arg_name = "OPT_ARG",
+        .desc = "take some optional argument",
     },
+    
     EXTOPTS_ORIG_END
 };
 
@@ -59,7 +75,7 @@ int parse_arguments(int argc, char *argv[])
 	while (1) {
         int option_index = 0;
 
-		c = get_extopt_orig(argc, argv, "h",
+		c = get_extopt_orig(argc, argv, "hr:o::",
                             embox_opts_orig, &option_index);
 		if (c == -1)
 			break;
@@ -69,8 +85,14 @@ int parse_arguments(int argc, char *argv[])
             printf("Some error\n");
 			return -EINVAL;
 		case 'h':
-            printf("Found optiont 'h'\n");
-			return 0;
+            printf("Found option 'h'\n");
+			break;
+		case 'r':
+            printf("Found option 'r' with param %s\n", optarg);
+			break;
+		case 'o':
+            printf("Found option 'o' with param %s\n", optarg);
+			break;
 		}
 	}
 	
