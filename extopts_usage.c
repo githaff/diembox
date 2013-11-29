@@ -249,36 +249,3 @@ void extopts_usage(struct extopt *opts)
         i++;
     }
 }
-
-/*
- * Usage generation for getopt-compatible verstion of structures.
- */
-void extopts_usage_orig(struct extopt_orig *opts_orig)
-{
-    struct extopt *opts;
-    int num_of_opts;
-    int i;
-
-    i = 0;
-    while (1) {
-        if (opt_orig_is_end(opts_orig[i]))
-            break;
-
-        i++;
-    }
-    num_of_opts = i;
-
-    /* Comopse transformed extopts for usage generation */
-    opts = (struct extopt *)calloc(num_of_opts + 1, sizeof(struct extopt));
-    for (i = 0; i < num_of_opts; i++) {
-        opts[i].name_long = opts_orig[i].name;
-        opts[i].name_short = opts_orig[i].name_short;
-        opts[i].has_arg = opts_orig[i].has_arg;
-        opts[i].arg_name = opts_orig[i].arg_name;
-        opts[i].desc = opts_orig[i].desc;
-    }
-
-    extopts_usage(opts);
-    
-    free(opts);
-}
