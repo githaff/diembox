@@ -26,17 +26,17 @@ int check_extopt(struct extopt *opt)
         opt_name = opt_name_reserved;
 
     if (!opt->name_long && !opt->name_short) {
-        printf("Error: '%s' extopt doesn't have any name.\n", opt_name);
+        fprintf(stderr, "Error: '%s' extopt doesn't have any name.\n", opt_name);
         ret = 1;
     }
 
     if (!opt->arg.addr) {
-        printf("Error: '%s' extopt has unspecified argument value\n", opt_name);
+        fprintf(stderr, "Error: '%s' extopt has unspecified argument value\n", opt_name);
         ret = 1;
     }
 
     if (opt->has_arg != no_argument && opt->has_arg != required_argument) {
-        printf("Error: '%s' extopt has invalid number of arguments (%d)\n",
+        fprintf(stderr, "Error: '%s' extopt has invalid number of arguments (%d)\n",
                opt_name, opt->has_arg);
         ret = 1;
     }
@@ -97,7 +97,7 @@ struct option *compose_longopts(struct extopt *opts, char *optstring)
     longopts = (struct option *)calloc(num_of_opts + 1, sizeof(struct option));
     for (i = 0, j = 0; i < num_of_opts; i++, j++) {
         if (opts[i].has_arg == optional_argument) {
-            printf("Error: optional arguments are not supported in %s\n",__func__);
+            fprintf(stderr, "Error: optional arguments are not supported in %s\n",__func__);
             j--;
             continue;
         }
@@ -213,19 +213,16 @@ int default_setter_float(struct extopt *opt, const char *arg)
 
     switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_FLOAT:
-        printf("==== %d\n", __LINE__);
         *(float *)opt->arg.addr = strtof(arg, &endptr);
         if (*endptr && !*arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_DOUBLE:
-        printf("==== %d\n", __LINE__);
         *(double *)opt->arg.addr = strtod(arg, &endptr);
         if (*endptr && !*arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_LDOUBLE:
-        printf("==== %d\n", __LINE__);
         *(long double *)opt->arg.addr = strtold(arg, &endptr);
         if (*endptr && !*arg)
             ret = 1;
@@ -370,12 +367,12 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
         ret = default_setter(&opts[index], optarg);
         if (ret) {
             if (opts[index].name_long)
-                printf("Error: parsing '%s' argument of parameter "
+                fprintf(stderr, "Error: parsing '%s' argument of parameter "
                        "'%s' (type %s) has failed\n",
                        optarg, opts[index].name_long,
                        get_argtype_name(opts[index].arg_type));
             else
-                printf("Error: parsing '%s' argument of parameter "
+                fprintf(stderr, "Error: parsing '%s' argument of parameter "
                        "'%c' (type %s) has failed\n",
                        optarg, opts[index].name_short,
                        get_argtype_name(opts[index].arg_type));
