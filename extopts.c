@@ -88,7 +88,7 @@ int find_short(struct extopt *opts, int name_short)
 /*
  * Default argument parser. Applied for all standart argument types.
  */
-int default_setter(struct extopt *opt, char *arg)
+int default_setter(struct extopt *opt, const char *arg)
 {
     int ret = 0;
     char *endptr;
@@ -101,7 +101,7 @@ int default_setter(struct extopt *opt, char *arg)
         *opt->arg.flag_addr = 1;
         break;
     case EXTOPT_ARGTYPE_STR:
-        *(const char **)opt->arg.addr = arg;
+        *opt->arg.const_str = arg;
         break;
     case EXTOPT_ARGTYPE_STR_ALLOC:
         strcpy(opt->arg.addr, arg);

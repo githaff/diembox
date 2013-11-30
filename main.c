@@ -29,10 +29,10 @@ void embox_usage(void)
 
 int  opts_help;
 int   opts_some_num;
-char *opts_some_str;
+const char *opts_some_str;
 char opts_some_str_alloc[64];
 long int   opts_spec_num;
-int opts_set(struct extopt *opt, char *arg)
+int opts_set(struct extopt *opt, const char *arg)
 {
     (void)opt;
     

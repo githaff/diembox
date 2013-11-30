@@ -55,8 +55,9 @@ struct extopt {
     enum extopt_argtype arg_type;
     union {
         void *addr;
+        const char **const_str;
         int *flag_addr;
-        int (*setter)(struct extopt *opt, char *arg);
+        int (*setter)(struct extopt *opt, const char *arg);
     } arg;
 };
 
@@ -79,7 +80,7 @@ struct extopt {
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
         .arg_type = EXTOPT_ARGTYPE_STR,          \
-        .arg.addr = ADDR
+        .arg.const_str = ADDR
 #define EXTOPT_ARG_STR_ALLOC(NAME, ADDR)         \
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
