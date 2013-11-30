@@ -30,6 +30,7 @@ void embox_usage(void)
 int  opts_help;
 int   opts_some_num;
 char *opts_some_str;
+char opts_some_str_alloc[64];
 long int   opts_spec_num;
 int opts_set(struct extopt *opt, char *arg)
 {
@@ -58,6 +59,11 @@ struct extopt embox_opts[] = {
         EXTOPT_ARG_STR("STR", &opts_some_str),
         .desc = "specify some string",
     }, {
+        .name_long = "some-str-all",
+        .name_short = 's',
+        EXTOPT_ARG_STR_ALLOC("SSTR", opts_some_str_alloc),
+        .desc = "specify some string",
+    }, {
         .name_long = "some-spec",
         .name_short = 'c',
         EXTOPT_ARG_SPECIAL("SPEC", opts_set),
@@ -72,6 +78,7 @@ int parse_arguments(int argc, char *argv[])
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
     printf(":: str = %s\n", opts_some_str);
+    printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
 
     get_extopts(argc, argv, embox_opts);
@@ -80,6 +87,7 @@ int parse_arguments(int argc, char *argv[])
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
     printf(":: str = %s\n", opts_some_str);
+    printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
 
     return 0;
