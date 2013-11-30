@@ -129,6 +129,24 @@ char *get_argtype_name(enum extopt_argtype argtype)
 }
 
 /*
+ * Clean flags of all no-argumented parameters.
+ */
+void empty_noargers(struct extopt *opts)
+{
+    int i = 0;
+
+    while (1) {
+        if (opt_is_end(opts[i]))
+            break;
+
+        if (opts[i].arg_type == EXTOPT_ARGTYPE_NO_ARG)
+            *opts[i].arg.flag_addr = 1;
+
+        i++;
+    }
+}
+
+/*
  * Parse command line arguments.
  */
 int get_extopts(int argc, char *argv[], struct extopt *opts)
@@ -136,6 +154,8 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
     int ret;
     struct option *longopts;
     char optstring[64];
+
+    empty_noargers(opts);
 
     /* Compose option structs from extopt */
     longopts = compose_longopts(opts, optstring);
