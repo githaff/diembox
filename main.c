@@ -68,6 +68,7 @@ struct extopt embox_opts[] = {
 
 int parse_arguments(int argc, char *argv[])
 {
+    printf(":: ==== BEFORE ====\n");
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
     printf(":: str = %s\n", opts_some_str);
@@ -75,6 +76,7 @@ int parse_arguments(int argc, char *argv[])
 
     get_extopt(argc, argv, embox_opts);
 
+    printf(":: ==== AFTER ====\n");
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
     printf(":: str = %s\n", opts_some_str);
