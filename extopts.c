@@ -125,13 +125,13 @@ char *get_argtype_name(enum extopt_argtype argtype)
     case EXTOPT_ARGTYPE_SPECIAL: return "SPECIAL";
     }
 
-    return NAME_EXTOPT_ARGTYPE_UNKNOWN;
+    return "UNKNOWN";
 }
 
 /*
  * Parse command line arguments.
  */
-int get_extopt(int argc, char *argv[], struct extopt *opts)
+int get_extopts(int argc, char *argv[], struct extopt *opts)
 {
     int ret;
     struct option *longopts;
@@ -166,12 +166,12 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
         if (ret) {
             if (opts[index].name_long)
                 printf("Error: parsing '%s' argument of parameter "
-                       "'%s' (%s) has failed\n",
+                       "'%s' (type %s) has failed\n",
                        optarg, opts[index].name_long,
                        get_argtype_name(opts[index].arg_type));
             else
                 printf("Error: parsing '%s' argument of parameter "
-                       "'%c' (%s) has failed\n",
+                       "'%c' (type %s) has failed\n",
                        optarg, opts[index].name_short,
                        get_argtype_name(opts[index].arg_type));
             goto err;

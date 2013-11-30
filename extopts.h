@@ -92,7 +92,7 @@ struct extopt {
 
 
 void extopts_usage(struct extopt *opts);
-int get_extopt(int argc, char *argv[], struct extopt *opts);
+int get_extopts(int argc, char *argv[], struct extopt *opts);
 
 inline static char opt_is_end(struct extopt opt)
 {

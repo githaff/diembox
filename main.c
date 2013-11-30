@@ -74,7 +74,7 @@ int parse_arguments(int argc, char *argv[])
     printf(":: str = %s\n", opts_some_str);
     printf(":: spec = %ld\n", opts_spec_num);
 
-    get_extopt(argc, argv, embox_opts);
+    get_extopts(argc, argv, embox_opts);
 
     printf(":: ==== AFTER ====\n");
     printf(":: help = %d\n", opts_help);
