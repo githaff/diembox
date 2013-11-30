@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "extopts.h"
 
@@ -90,6 +91,7 @@ int find_short(struct extopt *opts, int name_short)
 int default_setter(struct extopt *opt, char *arg)
 {
     int ret = 0;
+    char *endptr;
 
     switch (opt->arg_type) {
     case EXTOPT_ARGTYPE_SPECIAL:
@@ -102,7 +104,9 @@ int default_setter(struct extopt *opt, char *arg)
         *(char **)opt->arg.addr = arg;
         break;
     case EXTOPT_ARGTYPE_INT:
-        *(int *)opt->arg.addr = strtol(arg, NULL, 0);
+        *(int *)opt->arg.addr = strtol(arg, &endptr, 0);
+        if (*endptr && !*arg)
+            ret = 1;
         break;
     case EXTOPT_ARGTYPE_CHAR:
         *(char *)opt->arg.addr = arg[0];
