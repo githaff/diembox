@@ -142,26 +142,14 @@ int find_short(struct extopt *opts, int name_short)
 
 
 /*
- * Default argument parser. Applied for all standart argument types.
+ * Default integer types setter.
  */
-int default_setter(struct extopt *opt, const char *arg)
+int default_setter_int(struct extopt *opt, const char *arg)
 {
     int ret = 0;
     char *endptr;
 
-    switch (opt->arg_type) {
-    case EXTOPT_ARGTYPE_SPECIAL:
-        opt->arg.setter(opt, arg);
-        break;
-    case EXTOPT_ARGTYPE_NO_ARG:
-        *opt->arg.flag_addr = 1;
-        break;
-    case EXTOPT_ARGTYPE_STR:
-        *opt->arg.const_str = arg;
-        break;
-    case EXTOPT_ARGTYPE_STR_ALLOC:
-        strcpy(opt->arg.addr, arg);
-        break;
+    switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_INT:
         *(int *)opt->arg.addr = strtol(arg, &endptr, 0);
         if (*endptr && !*arg)
@@ -177,6 +165,22 @@ int default_setter(struct extopt *opt, const char *arg)
         if (*endptr && !*arg)
             ret = 1;
         break;
+    default:
+        ret = 1;
+    }
+
+    return ret;
+}
+
+/*
+ * Default unsigned integer types setter.
+ */
+int default_setter_uint(struct extopt *opt, const char *arg)
+{
+    int ret = 0;
+    char *endptr;
+
+    switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_UINT:
         *(unsigned int *)opt->arg.addr = strtoul(arg, &endptr, 0);
         if (*endptr && !*arg)
@@ -191,6 +195,44 @@ int default_setter(struct extopt *opt, const char *arg)
         *(unsigned long long int *)opt->arg.addr = strtoull(arg, &endptr, 0);
         if (*endptr && !*arg)
             ret = 1;
+        break;
+    default:
+        ret = 1;
+    }
+
+    return ret;
+}
+
+
+/*
+ * Default argument parser. Applied for all standart argument types.
+ */
+int default_setter(struct extopt *opt, const char *arg)
+{
+    int ret = 0;
+
+    switch (opt->arg_type) {
+    case EXTOPT_ARGTYPE_SPECIAL:
+        opt->arg.setter(opt, arg);
+        break;
+    case EXTOPT_ARGTYPE_NO_ARG:
+        *opt->arg.flag_addr = 1;
+        break;
+    case EXTOPT_ARGTYPE_STR:
+        *opt->arg.const_str = arg;
+        break;
+    case EXTOPT_ARGTYPE_STR_ALLOC:
+        strcpy(opt->arg.addr, arg);
+        break;
+    case EXTOPT_ARGTYPE_INT:
+    case EXTOPT_ARGTYPE_LINT:
+    case EXTOPT_ARGTYPE_LLINT:
+        ret = default_setter_int(opt, arg);
+        break;
+    case EXTOPT_ARGTYPE_UINT:
+    case EXTOPT_ARGTYPE_ULINT:
+    case EXTOPT_ARGTYPE_ULLINT:
+        ret = default_setter_uint(opt, arg);
         break;
     case EXTOPT_ARGTYPE_CHAR:
         *(char *)opt->arg.addr = arg[0];
