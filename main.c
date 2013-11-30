@@ -59,11 +59,11 @@ struct extopt embox_opts[] = {
     }, {
         .name_long = "some-long-num",
         .name_short = 'l',
-        EXTOPT_ARG_LONG_INT("NUM", &opts_some_long_num),
+        EXTOPT_ARG_LINT("NUM", &opts_some_long_num),
         .desc = "specify some number",
     }, {
         .name_long = "some-long-long-num",
-        EXTOPT_ARG_LONG_LONG_INT("NUM", &opts_some_long_long_num),
+        EXTOPT_ARG_LLINT("NUM", &opts_some_long_long_num),
         .desc = "specify some number",
     }, {
         .name_long = "some-str",
