@@ -29,6 +29,8 @@ void embox_usage(void)
 
 int  opts_help;
 int   opts_some_num;
+long int   opts_some_long_num;
+long long int   opts_some_long_long_num;
 const char *opts_some_str;
 char opts_some_str_alloc[64];
 long int   opts_spec_num;
@@ -55,6 +57,15 @@ struct extopt embox_opts[] = {
         EXTOPT_ARG_INT("NUM", &opts_some_num),
         .desc = "specify some number",
     }, {
+        .name_long = "some-long-num",
+        .name_short = 'l',
+        EXTOPT_ARG_LONG_INT("NUM", &opts_some_long_num),
+        .desc = "specify some number",
+    }, {
+        .name_long = "some-long-long-num",
+        EXTOPT_ARG_LONG_LONG_INT("NUM", &opts_some_long_long_num),
+        .desc = "specify some number",
+    }, {
         .name_long = "some-str",
         EXTOPT_ARG_STR("STR", &opts_some_str),
         .desc = "specify some string",
@@ -77,6 +88,8 @@ int parse_arguments(int argc, char *argv[])
     printf(":: ==== BEFORE ====\n");
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
+    printf(":: long-num = %ld\n", opts_some_long_num);
+    printf(":: long-long-num = %lld\n", opts_some_long_long_num);
     printf(":: str = %s\n", opts_some_str);
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
@@ -87,6 +100,8 @@ int parse_arguments(int argc, char *argv[])
     printf(":: ==== AFTER ====\n");
     printf(":: help = %d\n", opts_help);
     printf(":: num = %d\n", opts_some_num);
+    printf(":: long-num = %ld\n", opts_some_long_num);
+    printf(":: long-long-num = %lld\n", opts_some_long_long_num);
     printf(":: str = %s\n", opts_some_str);
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);

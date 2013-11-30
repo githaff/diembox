@@ -167,6 +167,16 @@ int default_setter(struct extopt *opt, const char *arg)
         if (*endptr && !*arg)
             ret = 1;
         break;
+    case EXTOPT_ARGTYPE_LONG_INT:
+        *(long int *)opt->arg.addr = strtol(arg, &endptr, 0);
+        if (*endptr && !*arg)
+            ret = 1;
+        break;
+    case EXTOPT_ARGTYPE_LONG_LONG_INT:
+        *(long long int *)opt->arg.addr = strtoll(arg, &endptr, 0);
+        if (*endptr && !*arg)
+            ret = 1;
+        break;
     case EXTOPT_ARGTYPE_CHAR:
         *(char *)opt->arg.addr = arg[0];
         break;
@@ -185,6 +195,8 @@ char *get_argtype_name(enum extopt_argtype argtype)
     case EXTOPT_ARGTYPE_STR:           return "STR";
     case EXTOPT_ARGTYPE_STR_ALLOC:     return "STR";
     case EXTOPT_ARGTYPE_INT:           return "INT";
+    case EXTOPT_ARGTYPE_LONG_INT:      return "LONG_INT";
+    case EXTOPT_ARGTYPE_LONG_LONG_INT: return "LONG_LONG_INT";
     case EXTOPT_ARGTYPE_CHAR:          return "CHAR";
     case EXTOPT_ARGTYPE_SPECIAL:       return "SPECIAL";
     }

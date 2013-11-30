@@ -35,6 +35,8 @@ enum extopt_argtype {
     EXTOPT_ARGTYPE_STR,
     EXTOPT_ARGTYPE_STR_ALLOC,
     EXTOPT_ARGTYPE_INT,
+    EXTOPT_ARGTYPE_LONG_INT,
+    EXTOPT_ARGTYPE_LONG_LONG_INT,
     EXTOPT_ARGTYPE_CHAR,
     /* Field 'arg' will be used as 'setter' handler which will be
      * called for argument parsing */
@@ -75,6 +77,16 @@ struct extopt {
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
         .arg_type = EXTOPT_ARGTYPE_INT,          \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_LONG_INT(NAME, ADDR)          \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_LONG_INT,     \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_LONG_LONG_INT(NAME, ADDR)     \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_LONG_LONG_INT,\
         .arg.addr = ADDR
 #define EXTOPT_ARG_STR(NAME, ADDR)               \
     .has_arg = required_argument,                \
