@@ -15,9 +15,6 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
     int num_of_opts;
     struct option *longopts;
     char optstring[64];
-
-    (void)argc;
-    (void)argv;
     
     i = 0; 
     while (1) {
@@ -53,7 +50,7 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
     while (1) {
         int index;
         int my;
-        
+
 		index = getopt_long(argc, argv, optstring,
                         longopts, &my);
 		if (index == -1)
@@ -62,29 +59,25 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
 			return 1;
         }
 
-        printf("?==> %d (%c)\n", index, index);
-        
         if (opts[index].has_arg == no_argument) {
             *(char *)opts[index].arg.addr = 1;
             continue;
         }
-            
+
         switch (opts[index].arg_type) {
-        case EXTARG_STR:
-            printf(":::: str - 0\n");
+        case EXTOPT_ARGTYPE_STR:
             *(char **)opts[index].arg.addr = optarg;
-            printf(":::: str - 1\n");
             break;
-        case EXTARG_INT:
+        case EXTOPT_ARGTYPE_INT:
             *(int *)opts[index].arg.addr = strtol(optarg, NULL, 0);
             break;
-        case EXTARG_CHAR:
+        case EXTOPT_ARGTYPE_CHAR:
             *(char *)opts[index].arg.addr = optarg[0];
             break;
-        case EXTARG_SPECIAL:
-            printf(":::: - spec\n");
+        case EXTOPT_ARGTYPE_SPECIAL:
             opts[index].arg.setter(&opts[index], optarg);
-            printf(":::: - spec - 0\n");
+            break;
+        case EXTOPT_ARGTYPE_NO_ARG:
             break;
         }
 	}

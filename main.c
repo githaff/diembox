@@ -27,16 +27,18 @@ void embox_usage(void)
            "Commands:\n", embox_name);
 }
 
-char  opts_help;
+int  opts_help;
 int   opts_some_num;
 char *opts_some_str;
 long int   opts_spec_num;
-void  opts_set(struct extopt *opt, char *arg)
+int opts_set(struct extopt *opt, char *arg)
 {
     (void)opt;
     
     printf("Opt set '%s'\n", arg);
     opts_spec_num = strtol(arg, NULL, 10);
+
+    return 0;
 }
 
 
@@ -44,34 +46,23 @@ struct extopt embox_opts[] = {
     {
         .name_long = "help",
         .name_short = 'h',
-        .has_arg = no_argument,
-        .arg_name = NULL,
+        EXTOPT_NO_ARG(&opts_help),
         .desc = "print this help",
-        .arg.addr = &opts_help,
     }, {
         .name_long = "some-num",
         .name_short = 'n',
-        .has_arg = required_argument,
-        .arg_name = "NUM",
+        EXTOPT_ARG_INT("NUM", &opts_some_num),
         .desc = "specify some number",
-        .arg_type = EXTARG_INT,
-        .arg.addr = &opts_some_num,
     }, {
         .name_long = "some-str",
         .name_short = 's',
-        .has_arg = required_argument,
-        .arg_name = "STR",
+        EXTOPT_ARG_STR("STR", &opts_some_str),
         .desc = "specify some string",
-        .arg_type = EXTARG_STR,
-        .arg.addr = &opts_some_str,
     }, {
         .name_long = "some-spec",
         .name_short = 'c',
-        .has_arg = required_argument,
-        .arg_name = "SPEC",
+        EXTOPT_ARG_SPECIAL("SPEC", opts_set),
         .desc = "specify some string",
-        .arg_type = EXTARG_SPECIAL,
-        .arg.setter = opts_set,
     },
     EXTOPTS_END
 };
@@ -101,9 +92,9 @@ int main(int argc, char *argv[])
 
     printf("Options\n");
     extopts_usage(embox_opts);
-
-    parse_arguments(argc, argv);
     
+    parse_arguments(argc, argv);
+
     return 0;
 
 	toolname = basename(argv[0]);

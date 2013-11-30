@@ -25,13 +25,19 @@
  * Defines the way argument will be written into @arg field of extopt
  * structure.
  */
-enum extarg_type {
-    /* Will use default string transforms if needed */
-    EXTARG_STR,
-    EXTARG_INT,
-    EXTARG_CHAR,
-    /* Will call function from pointer in @arg of extopt structure */
-    EXTARG_SPECIAL,
+enum extopt_argtype {
+    /* Field 'arg' will be used as 'flag' pointing to flag for whether
+     * parameter was met in command line or not */
+    EXTOPT_ARGTYPE_NO_ARG,
+    /* Field 'arg' will be used as 'addr' pointing to the variable of
+     * corresponding size where parsed parameter argument value will
+     * be stored */
+    EXTOPT_ARGTYPE_STR,
+    EXTOPT_ARGTYPE_INT,
+    EXTOPT_ARGTYPE_CHAR,
+    /* Field 'arg' will be used as 'setter' handler which will be
+     * called for argument parsing */
+    EXTOPT_ARGTYPE_SPECIAL,
 };
 
 /*
@@ -40,19 +46,50 @@ enum extarg_type {
 struct extopt {
     char *name_long;
     char name_short;
-    int has_arg;
-    char *arg_name;
     char *desc;
     
-    /* Returned argument */
-    enum extarg_type arg_type;
+    /* Option argument */
+    int has_arg;
+    char *arg_name;
+    enum extopt_argtype arg_type;
     union {
         void *addr;
-        void (*setter)(struct extopt *opt, char *arg);
+        int *flag_addr;
+        int (*setter)(struct extopt *opt, char *arg);
     } arg;
 };
 
+/* Should be used as end of extopt array */
 #define EXTOPTS_END { 0, 0, 0, 0, 0, 0, {0} }
+
+/* Macro for extopt struct initialization depending on option argument
+ * type */
+#define EXTOPT_NO_ARG(FLAG_ADDR)                \
+    .has_arg = no_argument,                     \
+        .arg_name = NULL,                       \
+        .arg_type = EXTOPT_ARGTYPE_NO_ARG,      \
+        .arg.flag_addr = FLAG_ADDR
+#define EXTOPT_ARG_INT(NAME, ADDR)               \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_INT,          \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_STR(NAME, ADDR)               \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_STR,          \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_CHAR(NAME, ADDR)              \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_CHAR,         \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_SPECIAL(NAME, SETTER_FUNC)    \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_SPECIAL,      \
+        .arg.setter = SETTER_FUNC
+
 
 void extopts_usage(struct extopt *opts);
 int get_extopt(int argc, char *argv[], struct extopt *opts);
