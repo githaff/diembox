@@ -55,7 +55,6 @@ struct extopt embox_opts[] = {
         .desc = "specify some number",
     }, {
         .name_long = "some-str",
-        .name_short = 's',
         EXTOPT_ARG_STR("STR", &opts_some_str),
         .desc = "specify some string",
     }, {

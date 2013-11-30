@@ -49,20 +49,23 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
 
     while (1) {
         int index;
-        int my;
+        int index_short;
+        int index_long  = -1;
 
-		index = getopt_long(argc, argv, optstring,
-                        longopts, &my);
-		if (index == -1)
-			break;
-        else if (index == '?') {
+		index_short = getopt_long(argc, argv, optstring,
+                                  longopts, &index_long);
+
+        if (index_long > -1)
+            index = index_long;
+        else if (index_short > 0) {
+            for (i = 0; i < num_of_opts; i++) {
+                if (index_short == opts[i].name_short)
+                    index = i;
+            }
+            if (index < 0)
+                return 1;
+        } else
 			return 1;
-        }
-
-        if (opts[index].has_arg == no_argument) {
-            *(char *)opts[index].arg.addr = 1;
-            continue;
-        }
 
         switch (opts[index].arg_type) {
         case EXTOPT_ARGTYPE_STR:
@@ -78,6 +81,7 @@ int get_extopt(int argc, char *argv[], struct extopt *opts)
             opts[index].arg.setter(&opts[index], optarg);
             break;
         case EXTOPT_ARGTYPE_NO_ARG:
+            *opts[index].arg.flag_addr = 1;
             break;
         }
 	}
