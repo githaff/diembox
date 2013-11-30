@@ -28,9 +28,12 @@ void embox_usage(void)
 }
 
 int  opts_help;
-int   opts_some_num;
-long int   opts_some_long_num;
-long long int   opts_some_long_long_num;
+int                      opts_int;
+long int                 opts_lint;
+long long int            opts_llint;
+unsigned int             opts_uint;
+unsigned long int        opts_ulint;
+unsigned long long int   opts_ullint;
 const char *opts_some_str;
 char opts_some_str_alloc[64];
 long int   opts_spec_num;
@@ -52,19 +55,31 @@ struct extopt embox_opts[] = {
         EXTOPT_NO_ARG(&opts_help),
         .desc = "print this help",
     }, {
-        .name_long = "some-num",
-        .name_short = 'n',
-        EXTOPT_ARG_INT("NUM", &opts_some_num),
-        .desc = "specify some number",
+        .name_long = "int",
+        .name_short = 'i',
+        EXTOPT_ARG_INT("NUM", &opts_int),
+        .desc = "specify int",
     }, {
-        .name_long = "some-long-num",
-        .name_short = 'l',
-        EXTOPT_ARG_LINT("NUM", &opts_some_long_num),
-        .desc = "specify some number",
+        .name_long = "lint",
+        EXTOPT_ARG_LINT("NUM", &opts_lint),
+        .desc = "specify long int",
     }, {
-        .name_long = "some-long-long-num",
-        EXTOPT_ARG_LLINT("NUM", &opts_some_long_long_num),
-        .desc = "specify some number",
+        .name_long = "llint",
+        EXTOPT_ARG_LLINT("NUM", &opts_llint),
+        .desc = "specify long long int",
+    }, {
+        .name_long = "uint",
+        .name_short = 'u',
+        EXTOPT_ARG_UINT("NUM", &opts_uint),
+        .desc = "specify unsigned int",
+    }, {
+        .name_long = "ulint",
+        EXTOPT_ARG_ULINT("NUM", &opts_ulint),
+        .desc = "specify unsigned long int",
+    }, {
+        .name_long = "ullint",
+        EXTOPT_ARG_ULLINT("NUM", &opts_ullint),
+        .desc = "specify unsigned long long int",
     }, {
         .name_long = "some-str",
         EXTOPT_ARG_STR("STR", &opts_some_str),
@@ -87,9 +102,12 @@ int parse_arguments(int argc, char *argv[])
 {
     printf(":: ==== BEFORE ====\n");
     printf(":: help = %d\n", opts_help);
-    printf(":: num = %d\n", opts_some_num);
-    printf(":: long-num = %ld\n", opts_some_long_num);
-    printf(":: long-long-num = %lld\n", opts_some_long_long_num);
+    printf(":: int = %d\n",             opts_int);
+    printf(":: long-int = %ld\n",       opts_lint);
+    printf(":: long-long-int = %lld\n", opts_llint);
+    printf(":: unsigned int = %u\n",             opts_uint);
+    printf(":: unsigned long-int = %lu\n",       opts_ulint);
+    printf(":: unsigned long-long-int = %llu\n", opts_ullint);
     printf(":: str = %s\n", opts_some_str);
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
@@ -99,9 +117,12 @@ int parse_arguments(int argc, char *argv[])
 
     printf(":: ==== AFTER ====\n");
     printf(":: help = %d\n", opts_help);
-    printf(":: num = %d\n", opts_some_num);
-    printf(":: long-num = %ld\n", opts_some_long_num);
-    printf(":: long-long-num = %lld\n", opts_some_long_long_num);
+    printf(":: int = %d\n",             opts_int);
+    printf(":: long-int = %ld\n",       opts_lint);
+    printf(":: long-long-int = %lld\n", opts_llint);
+    printf(":: unsigned int = %u\n",             opts_uint);
+    printf(":: unsigned long-int = %lu\n",       opts_ulint);
+    printf(":: unsigned long-long-int = %llu\n", opts_ullint);
     printf(":: str = %s\n", opts_some_str);
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
