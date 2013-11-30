@@ -81,7 +81,8 @@ int parse_arguments(int argc, char *argv[])
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);
 
-    get_extopts(argc, argv, embox_opts);
+    if (get_extopts(argc, argv, embox_opts))
+        printf("Error: parsing command line arguments failed\n");
 
     printf(":: ==== AFTER ====\n");
     printf(":: help = %d\n", opts_help);

@@ -7,6 +7,62 @@
 
 
 /*
+ * Check option for validity.
+ * It is automatically preformed before parsing command line
+ * arguments.
+ */
+int check_extopt(struct extopt *opt)
+{
+    int ret = 0;
+    char opt_name_reserved[] = "<unnamed>";
+    char *opt_name;
+
+    if (opt->name_long && *opt->name_long)
+        opt_name = opt->name_long;
+    else if (opt->name_short) {
+        opt_name_reserved[0] = opt->name_short;
+        opt_name_reserved[1] = 0;
+    } else
+        opt_name = opt_name_reserved;
+
+    if (!opt->name_long && !opt->name_short) {
+        printf("Error: '%s' extopt doesn't have any name.\n", opt_name);
+        ret = 1;
+    }
+
+    if (!opt->arg.addr) {
+        printf("Error: '%s' extopt has unspecified argument value\n", opt_name);
+        ret = 1;
+    }
+
+    if (opt->has_arg != no_argument && opt->has_arg != required_argument) {
+        printf("Error: '%s' extopt has invalid number of arguments (%d)\n",
+               opt_name, opt->has_arg);
+        ret = 1;
+    }
+
+    return ret;
+}
+
+int validate_extopts(struct extopt *opts)
+{
+    int ret = 0;
+    int i;
+
+    i = 0;
+    while (1) {
+        if (opt_is_end(opts[i]))
+            break;
+        if (check_extopt(&opts[i]))
+            ret = 1;
+
+        i++;
+    }
+
+    return ret;
+}
+
+/*
  * Count number of extopts in array.
  */
 int count_extopts(struct extopt *opts)
@@ -160,8 +216,13 @@ void empty_noargers(struct extopt *opts)
 int get_extopts(int argc, char *argv[], struct extopt *opts)
 {
     int ret;
-    struct option *longopts;
+    struct option *longopts = 0;
     char optstring[64];
+
+    if (validate_extopts(opts)) {
+        ret = 1;
+        goto err;
+    }
 
     empty_noargers(opts);
 
@@ -176,16 +237,19 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
 		index_short = getopt_long(argc, argv, optstring,
                                   longopts, &index_long);
 
+
+        if (index_short == -1 && index_long == -1)
+            break;
         if (index_long > -1)
             index = index_long;
         else if (index_short > 0) {
             index = find_short(opts, index_short);
-        } else {
-            ret = 1;
-            goto err;
+            if (index < 0) {
+                ret = 1;
+                goto err;
+            }
         }
-
-        if (index < 0) {
+        else {
             ret = 1;
             goto err;
         }
