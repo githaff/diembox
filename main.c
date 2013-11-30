@@ -34,6 +34,9 @@ long long int            opts_llint;
 unsigned int             opts_uint;
 unsigned long int        opts_ulint;
 unsigned long long int   opts_ullint;
+float         opts_float;
+double        opts_double;
+long double   opts_ldouble;
 const char *opts_some_str;
 char opts_some_str_alloc[64];
 long int   opts_spec_num;
@@ -81,6 +84,19 @@ struct extopt embox_opts[] = {
         EXTOPT_ARG_ULLINT("NUM", &opts_ullint),
         .desc = "specify unsigned long long int",
     }, {
+        .name_long = "float",
+        .name_short = 'f',
+        EXTOPT_ARG_FLOAT("NUM", &opts_float),
+        .desc = "specify float",
+    }, {
+        .name_long = "double",
+        EXTOPT_ARG_DOUBLE("NUM", &opts_double),
+        .desc = "specify double",
+    }, {
+        .name_long = "ldouble",
+        EXTOPT_ARG_LDOUBLE("NUM", &opts_ldouble),
+        .desc = "specify long double",
+    }, {
         .name_long = "some-str",
         EXTOPT_ARG_STR("STR", &opts_some_str),
         .desc = "specify some string",
@@ -123,6 +139,9 @@ int parse_arguments(int argc, char *argv[])
     printf(":: unsigned int = %u\n",             opts_uint);
     printf(":: unsigned long-int = %lu\n",       opts_ulint);
     printf(":: unsigned long-long-int = %llu\n", opts_ullint);
+    printf(":: float = %f\n",         opts_float);
+    printf(":: double = %lf\n",       opts_double);
+    printf(":: long double = %Lf\n",  opts_ldouble);
     printf(":: str = %s\n", opts_some_str);
     printf(":: str_alloc = %s\n", opts_some_str_alloc);
     printf(":: spec = %ld\n", opts_spec_num);

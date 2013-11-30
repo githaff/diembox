@@ -203,6 +203,39 @@ int default_setter_uint(struct extopt *opt, const char *arg)
     return ret;
 }
 
+/*
+ * Default floating-point types setter.
+ */
+int default_setter_float(struct extopt *opt, const char *arg)
+{
+    int ret = 0;
+    char *endptr;
+
+    switch(opt->arg_type) {
+    case EXTOPT_ARGTYPE_FLOAT:
+        printf("==== %d\n", __LINE__);
+        *(float *)opt->arg.addr = strtof(arg, &endptr);
+        if (*endptr && !*arg)
+            ret = 1;
+        break;
+    case EXTOPT_ARGTYPE_DOUBLE:
+        printf("==== %d\n", __LINE__);
+        *(double *)opt->arg.addr = strtod(arg, &endptr);
+        if (*endptr && !*arg)
+            ret = 1;
+        break;
+    case EXTOPT_ARGTYPE_LDOUBLE:
+        printf("==== %d\n", __LINE__);
+        *(long double *)opt->arg.addr = strtold(arg, &endptr);
+        if (*endptr && !*arg)
+            ret = 1;
+        break;
+    default:
+        ret = 1;
+    }
+
+    return ret;
+}
 
 /*
  * Default argument parser. Applied for all standart argument types.
@@ -234,6 +267,11 @@ int default_setter(struct extopt *opt, const char *arg)
     case EXTOPT_ARGTYPE_ULLINT:
         ret = default_setter_uint(opt, arg);
         break;
+    case EXTOPT_ARGTYPE_FLOAT:
+    case EXTOPT_ARGTYPE_DOUBLE:
+    case EXTOPT_ARGTYPE_LDOUBLE:
+        ret = default_setter_float(opt, arg);
+        break;
     case EXTOPT_ARGTYPE_CHAR:
         *(char *)opt->arg.addr = arg[0];
         break;
@@ -257,6 +295,9 @@ char *get_argtype_name(enum extopt_argtype argtype)
     case EXTOPT_ARGTYPE_UINT:          return "INT";
     case EXTOPT_ARGTYPE_ULINT:         return "ULINT";
     case EXTOPT_ARGTYPE_ULLINT:        return "ULLINT";
+    case EXTOPT_ARGTYPE_FLOAT:         return "FLOAT";
+    case EXTOPT_ARGTYPE_DOUBLE:        return "DOUBLE";
+    case EXTOPT_ARGTYPE_LDOUBLE:       return "LDOUBLE";
     case EXTOPT_ARGTYPE_CHAR:          return "CHAR";
     case EXTOPT_ARGTYPE_SPECIAL:       return "SPECIAL";
     }

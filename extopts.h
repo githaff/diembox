@@ -29,21 +29,28 @@ enum extopt_argtype {
     /* Field 'arg' will be used as 'flag' pointing to flag for whether
      * parameter was met in command line or not */
     EXTOPT_ARGTYPE_NO_ARG,
-    /* Field 'arg' will be used as 'addr' pointing to the variable of
-     * corresponding size where parsed parameter argument value will
-     * be stored */
-    EXTOPT_ARGTYPE_STR,
-    EXTOPT_ARGTYPE_STR_ALLOC,
-    EXTOPT_ARGTYPE_INT,
-    EXTOPT_ARGTYPE_LINT,
-    EXTOPT_ARGTYPE_LLINT,
-    EXTOPT_ARGTYPE_UINT,
-    EXTOPT_ARGTYPE_ULINT,
-    EXTOPT_ARGTYPE_ULLINT,
-    EXTOPT_ARGTYPE_CHAR,
     /* Field 'arg' will be used as 'setter' handler which will be
      * called for argument parsing */
     EXTOPT_ARGTYPE_SPECIAL,
+    /* Field 'arg' will be used as 'addr' pointing to the variable of
+     * corresponding size where parsed parameter argument value will
+     * be stored */
+    /* Signed integers */
+    EXTOPT_ARGTYPE_INT,
+    EXTOPT_ARGTYPE_LINT,
+    EXTOPT_ARGTYPE_LLINT,
+    /* Unsigned integers */
+    EXTOPT_ARGTYPE_UINT,
+    EXTOPT_ARGTYPE_ULINT,
+    EXTOPT_ARGTYPE_ULLINT,
+    /* Floating-point */
+    EXTOPT_ARGTYPE_FLOAT,
+    EXTOPT_ARGTYPE_DOUBLE,
+    EXTOPT_ARGTYPE_LDOUBLE,
+    /* Strings */
+    EXTOPT_ARGTYPE_STR,        /* Field 'const_str' is used instead of 'addr' */
+    EXTOPT_ARGTYPE_STR_ALLOC,
+    EXTOPT_ARGTYPE_CHAR,
 };
 
 /*
@@ -69,13 +76,11 @@ struct extopt {
 /* Should be used as end of extopt array */
 #define EXTOPTS_END { 0, 0, 0, 0, 0, 0, {0} }
 
-/* Macro for extopt struct initialization depending on option argument
- * type */
-#define EXTOPT_NO_ARG(FLAG_ADDR)                \
-    .has_arg = no_argument,                     \
-        .arg_name = NULL,                       \
-        .arg_type = EXTOPT_ARGTYPE_NO_ARG,      \
-        .arg.flag_addr = FLAG_ADDR
+/*
+ * Macro for extopt struct initialization depending on option argument
+ * type
+ */
+/* Signed integers */
 #define EXTOPT_ARG_INT(NAME, ADDR)               \
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
@@ -91,6 +96,8 @@ struct extopt {
         .arg_name = NAME,                        \
         .arg_type = EXTOPT_ARGTYPE_LLINT,        \
         .arg.addr = ADDR
+
+/* Unsigned integers */
 #define EXTOPT_ARG_UINT(NAME, ADDR)              \
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
@@ -106,6 +113,25 @@ struct extopt {
         .arg_name = NAME,                        \
         .arg_type = EXTOPT_ARGTYPE_ULLINT,       \
         .arg.addr = ADDR
+
+/* Floating-point */
+#define EXTOPT_ARG_FLOAT(NAME, ADDR)             \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_FLOAT,        \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_DOUBLE(NAME, ADDR)            \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_DOUBLE,       \
+        .arg.addr = ADDR
+#define EXTOPT_ARG_LDOUBLE(NAME, ADDR)           \
+    .has_arg = required_argument,                \
+        .arg_name = NAME,                        \
+        .arg_type = EXTOPT_ARGTYPE_LDOUBLE,      \
+        .arg.addr = ADDR
+
+/* Strings */
 #define EXTOPT_ARG_STR(NAME, ADDR)               \
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
@@ -121,6 +147,13 @@ struct extopt {
         .arg_name = NAME,                        \
         .arg_type = EXTOPT_ARGTYPE_CHAR,         \
         .arg.addr = ADDR
+
+/* Misc */
+#define EXTOPT_NO_ARG(FLAG_ADDR)                \
+    .has_arg = no_argument,                     \
+        .arg_name = NULL,                       \
+        .arg_type = EXTOPT_ARGTYPE_NO_ARG,      \
+        .arg.flag_addr = FLAG_ADDR
 #define EXTOPT_ARG_SPECIAL(NAME, SETTER_FUNC)    \
     .has_arg = required_argument,                \
         .arg_name = NAME,                        \
