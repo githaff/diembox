@@ -12,7 +12,7 @@
 
 char embox_name[] = "embox";
 int embox_name_len = sizeof(embox_name);
-void embox_usage(void)
+void embox_usage(struct extopt *opts)
 {
 	printf("Usage: %s [OPTIONS] COMMAND [COMMAND_OPTIONS]\n"
 		   "Embedded developer toolbox.\n"
@@ -21,35 +21,11 @@ void embox_usage(void)
            "may be replaced by other different tools. But it is simply convenient\n"
            "to hold it all in one console utility.\n"
 		   "\n"
-		   "Options:\n"
-		   "  -h|--help   print this help\n"
-           "\n"
-           "Commands:\n", embox_name);
+		   "Options:\n", embox_name);
+    extopts_usage(opts);
 }
 
 int  opts_help;
-int                      opts_int;
-long int                 opts_lint;
-long long int            opts_llint;
-unsigned int             opts_uint;
-unsigned long int        opts_ulint;
-unsigned long long int   opts_ullint;
-float         opts_float;
-double        opts_double;
-long double   opts_ldouble;
-const char *opts_some_str;
-char opts_some_str_alloc[64];
-long int   opts_spec_num;
-int opts_set(struct extopt *opt, const char *arg)
-{
-    (void)opt;
-    
-    printf("Opt set '%s'\n", arg);
-    opts_spec_num = strtol(arg, NULL, 10);
-
-    return 0;
-}
-
 
 struct extopt embox_opts[] = {
     {
@@ -57,123 +33,28 @@ struct extopt embox_opts[] = {
         .name_short = 'h',
         EXTOPT_NO_ARG(&opts_help),
         .desc = "print this help",
-    }, {
-        .name_long = "int",
-        .name_short = 'i',
-        EXTOPT_ARG_INT("NUM", &opts_int),
-        .desc = "specify int",
-    }, {
-        .name_long = "lint",
-        EXTOPT_ARG_LINT("NUM", &opts_lint),
-        .desc = "specify long int",
-    }, {
-        .name_long = "llint",
-        EXTOPT_ARG_LLINT("NUM", &opts_llint),
-        .desc = "specify long long int",
-    }, {
-        .name_long = "uint",
-        .name_short = 'u',
-        EXTOPT_ARG_UINT("NUM", &opts_uint),
-        .desc = "specify unsigned int",
-    }, {
-        .name_long = "ulint",
-        EXTOPT_ARG_ULINT("NUM", &opts_ulint),
-        .desc = "specify unsigned long int",
-    }, {
-        .name_long = "ullint",
-        EXTOPT_ARG_ULLINT("NUM", &opts_ullint),
-        .desc = "specify unsigned long long int",
-    }, {
-        .name_long = "float",
-        .name_short = 'f',
-        EXTOPT_ARG_FLOAT("NUM", &opts_float),
-        .desc = "specify float",
-    }, {
-        .name_long = "double",
-        EXTOPT_ARG_DOUBLE("NUM", &opts_double),
-        .desc = "specify double",
-    }, {
-        .name_long = "ldouble",
-        EXTOPT_ARG_LDOUBLE("NUM", &opts_ldouble),
-        .desc = "specify long double",
-    }, {
-        .name_long = "some-str",
-        EXTOPT_ARG_STR("STR", &opts_some_str),
-        .desc = "specify some string",
-    }, {
-        .name_long = "some-str-all",
-        .name_short = 's',
-        EXTOPT_ARG_STR_ALLOC("SSTR", opts_some_str_alloc),
-        .desc = "specify some string",
-    }, {
-        .name_long = "some-spec",
-        .name_short = 'c',
-        EXTOPT_ARG_SPECIAL("SPEC", opts_set),
-        .desc = "specify some string",
     },
     EXTOPTS_END
 };
-
-int parse_arguments(int argc, char *argv[])
-{
-    printf(":: ==== BEFORE ====\n");
-    printf(":: help = %d\n", opts_help);
-    printf(":: int = %d\n",             opts_int);
-    printf(":: long-int = %ld\n",       opts_lint);
-    printf(":: long-long-int = %lld\n", opts_llint);
-    printf(":: unsigned int = %u\n",             opts_uint);
-    printf(":: unsigned long-int = %lu\n",       opts_ulint);
-    printf(":: unsigned long-long-int = %llu\n", opts_ullint);
-    printf(":: str = %s\n", opts_some_str);
-    printf(":: str_alloc = %s\n", opts_some_str_alloc);
-    printf(":: spec = %ld\n", opts_spec_num);
-
-    if (get_extopts(argc, argv, embox_opts))
-        printf("Error: parsing command line arguments failed\n");
-
-    printf(":: ==== AFTER ====\n");
-    printf(":: help = %d\n", opts_help);
-    printf(":: int = %d\n",             opts_int);
-    printf(":: long-int = %ld\n",       opts_lint);
-    printf(":: long-long-int = %lld\n", opts_llint);
-    printf(":: unsigned int = %u\n",             opts_uint);
-    printf(":: unsigned long-int = %lu\n",       opts_ulint);
-    printf(":: unsigned long-long-int = %llu\n", opts_ullint);
-    printf(":: float = %f\n",         opts_float);
-    printf(":: double = %lf\n",       opts_double);
-    printf(":: long double = %Lf\n",  opts_ldouble);
-    printf(":: str = %s\n", opts_some_str);
-    printf(":: str_alloc = %s\n", opts_some_str_alloc);
-    printf(":: spec = %ld\n", opts_spec_num);
-
-    return 0;
-}
 
 
 int main(int argc, char *argv[])
 {
 	int ret = 0;
-	char *toolname;
 
-    printf("Options\n");
-    extopts_usage(embox_opts);
-    
-    parse_arguments(argc, argv);
-
-    return 0;
-
-	toolname = basename(argv[0]);
-
-	if (!strncmp(toolname, embox_name, embox_name_len)) {
-        embox_usage();
-		return ret;
+    if (get_extopts(argc, argv, embox_opts)) {
+        printf("Error: parsing command line arguments failed\n");
+        ret = 1;
+        goto err;
     }
-	else if (!strncmp(toolname, tobin_name, tobin_name_len))
-		ret = do_tobin(argc, argv);
-	else {
-		printf("Error: unknown toolname '%s'\n", toolname);
-		ret = -EINVAL;
-	}
+
+    if (opts_help) {
+        embox_usage(embox_opts);
+        goto end;
+    }
+
+err:
+end:
 
 	return ret;
 }
