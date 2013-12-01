@@ -314,7 +314,7 @@ void empty_noargers(struct extopt *opts)
             break;
 
         if (opts[i].arg_type == EXTOPT_ARGTYPE_NO_ARG)
-            *opts[i].arg.flag_addr = 1;
+            *opts[i].arg.flag_addr = 0;
 
         i++;
     }
