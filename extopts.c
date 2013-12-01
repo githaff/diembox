@@ -325,7 +325,7 @@ void empty_noargers(struct extopt *opts)
  */
 int get_extopts(int argc, char *argv[], struct extopt *opts)
 {
-    int ret;
+    int ret = 0;
     struct option *longopts = 0;
     char optstring[64];
 
