@@ -152,17 +152,17 @@ int default_setter_int(struct extopt *opt, const char *arg)
     switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_INT:
         *(int *)opt->arg.addr = strtol(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_LINT:
         *(long int *)opt->arg.addr = strtol(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_LLINT:
         *(long long int *)opt->arg.addr = strtoll(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     default:
@@ -183,17 +183,17 @@ int default_setter_uint(struct extopt *opt, const char *arg)
     switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_UINT:
         *(unsigned int *)opt->arg.addr = strtoul(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_ULINT:
         *(unsigned long int *)opt->arg.addr = strtoul(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_ULLINT:
         *(unsigned long long int *)opt->arg.addr = strtoull(arg, &endptr, 0);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     default:
@@ -214,17 +214,17 @@ int default_setter_float(struct extopt *opt, const char *arg)
     switch(opt->arg_type) {
     case EXTOPT_ARGTYPE_FLOAT:
         *(float *)opt->arg.addr = strtof(arg, &endptr);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_DOUBLE:
         *(double *)opt->arg.addr = strtod(arg, &endptr);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     case EXTOPT_ARGTYPE_LDOUBLE:
         *(long double *)opt->arg.addr = strtold(arg, &endptr);
-        if (*endptr && !*arg)
+        if (*endptr && *arg)
             ret = 1;
         break;
     default:
