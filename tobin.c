@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "extmods.h"
+
 #include "tobin.h"
 
 
@@ -74,3 +76,7 @@ int do_tobin(int argc, char *argv[])
 
 	return ret;
 }
+
+EXTMOD_DECL(tobin, do_tobin, 0)
+EXTMOD_DECL(tobineehy, do_tobin, 0)
+EXTMOD_DECL(tobin_2, do_tobin, 0)

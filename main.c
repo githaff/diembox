@@ -8,6 +8,7 @@
 #include "tobin.h"
 #include "module.h"
 #include "extopts.h"
+#include "extmods.h"
 
 
 char embox_name[] = "embox";
@@ -37,13 +38,15 @@ struct extopt embox_opts[] = {
     EXTOPTS_END
 };
 
-
 int main(int argc, char *argv[])
 {
 	int ret = 0;
+    struct extmod *module;
+    int index;
 
-    if (get_extopts(argc, argv, embox_opts)) {
-        printf("Error: parsing command line arguments failed\n");
+    index = get_extopts(argc, argv, embox_opts);
+    if (index < 0) {
+        fprintf(stderr, "Error: parsing command line arguments failed\n");
         ret = 1;
         goto err;
     }
@@ -52,6 +55,16 @@ int main(int argc, char *argv[])
         embox_usage(embox_opts);
         goto end;
     }
+
+    module = extmod_find("tobin");
+    if (!module) {
+        fprintf(stderr, "Error: no such command. See --help for details\n");
+        ret = 1;
+        goto err;
+    }
+    ret = module_exec(argc, argv, module);
+    if (ret)
+        goto err;
 
 err:
 end:
