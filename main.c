@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
 
     index = get_extopts(argc, argv, embox_opts);
     if (index < 0) {
-        fprintf(stderr, "Error: parsing command line arguments failed\n");
         ret = 1;
         goto err;
     }

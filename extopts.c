@@ -330,7 +330,7 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
     char optstring[64];
 
     if (validate_extopts(opts)) {
-        ret = 1;
+        ret = -1;
         goto err;
     }
 
@@ -347,7 +347,6 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
 		index_short = getopt_long(argc, argv, optstring,
                                   longopts, &index_long);
 
-
         if (index_short == -1 && index_long == -1)
             break;
         if (index_long > -1)
@@ -355,12 +354,12 @@ int get_extopts(int argc, char *argv[], struct extopt *opts)
         else if (index_short > 0) {
             index = find_short(opts, index_short);
             if (index < 0) {
-                ret = 1;
+                ret = -1;
                 goto err;
             }
         }
         else {
-            ret = 1;
+            ret = -1;
             goto err;
         }
 
