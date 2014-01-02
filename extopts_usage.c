@@ -34,8 +34,7 @@ inline static int validate_option(struct extopt *opt)
 
     if (opt->has_arg && !opt->arg_name) {
         fprintf(stderr,
-                "Error: option have %s argument but its name is not specified\n",
-                (opt->has_arg == optional_argument) ? "optional" : "required");
+                "Error: option has required argument but its name is not specified\n");
         return 1;
     }
 
@@ -90,17 +89,12 @@ int get_opt_length(struct extopt *opt)
 {
     int len = 0;
 
-    /* Printed format: '--<name> [<ARG>]' where [] are optional */
+    /* Printed format: '--<name> <ARG>' */
     if (opt->name_long)
         len += strlen(opt->name_long) + 2;
 
-    switch (opt->has_arg && opt->arg_name) {
-    case required_argument:
+    if (opt->has_arg && opt->arg_name)
         len += strlen(opt->arg_name) + 1;
-        break;
-    case optional_argument:
-        len += strlen(opt->arg_name) + 3;
-    }
 
     return len;
 }
@@ -192,10 +186,8 @@ void print_opt(struct extopt *opt, int desc_offset_norm, char any_short)
     bufsize = BUF_SIZE - i;
 
     /* Compose option argument */
-    if (opt->has_arg == required_argument)
+    if (opt->has_arg)
         i += snprintf(str, bufsize, " %s", opt->arg_name);
-    else if (opt->has_arg == optional_argument)
-        i += snprintf(str, bufsize, " [%s]", opt->arg_name);
     str     = buf + i;
     bufsize = BUF_SIZE - i;
 

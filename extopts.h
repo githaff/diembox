@@ -17,8 +17,6 @@
  * compatible).
  */
 
-#include <getopt.h>
-
 
 /*
  * Types of option argument.
