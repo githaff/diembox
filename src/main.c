@@ -28,10 +28,6 @@ struct extopt opts[] = {
 
 int main(int argc, char *argv[])
 {
-	int ret = 0;
-	struct extmod *module;
-	int index;
-
 	if (extopts_get(&argc, argv, opts))
 		return 1;
 	if (opts_help)
