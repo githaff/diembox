@@ -1,10 +1,20 @@
-# Generated binaries
-embox
-*.o
-
-# Generated links
-tobin
-
-# Temporary files
+### Project build results
+config.h
+/build
+### CMake
+CMakeFiles
+CMakeCache.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+install_manifest.txt
+cmake_install.cmake
+Makefile
+### Emacs temporary files
+\#*#
+### Misc
 *~
-
+### Generated files
+# generated distros
+/_CPack_Packages
+/embox-*
+.version
