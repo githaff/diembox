@@ -10,6 +10,14 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O0 -g")
 # Set additional warnings
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
 
+### TMP: link against extopts
+execute_process (
+  COMMAND pkg-config libextopts --cflags --libs
+  OUTPUT_VARIABLE EXTOPTS_CFLAGS
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTOPTS_CFLAGS}")
+
+
 ### Extract current version from version control if present.
 ### If not - take from .version file
 #if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
