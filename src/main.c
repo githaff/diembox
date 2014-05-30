@@ -17,8 +17,11 @@ void embox_usage()
 		   "can be used by anyone) and implements basic useful tools which perfectly\n"
 		   "may be replaced by other different tools. But it is simply convenient\n"
 		   "to hold it all in one console utility.\n"
-		   "\n"
-		   "Options:\n", embox_name);
+		   "\n", embox_name);
+	printf("Commands:\n");
+	extmods_usage_list();
+	printf("\n");
+	printf("Options:\n");
 	extopts_usage(opts);
 }
 
@@ -69,3 +72,38 @@ end:
 err:
 	return ret;
 }
+
+int help_module(int argc, char *argv[])
+{
+	struct extmod *module;
+	int ret = 0;
+
+	if (argc > 1)
+		module = extmod_find(argv[1]);
+	else {
+		embox_usage();
+		goto end;
+	}
+
+	if (module) {
+		extmod_print_desc(module);
+		if (extmod_has_opts(module)) {
+			printf("\n");
+			printf("Options:\n");
+			extmod_print_opts(module);
+		}
+	}
+	else {
+		fprintf(stderr, "Error: module %s is not found\n", argv[1]);
+		ret = 1;
+	}
+
+end:
+	return ret;
+}
+
+EXTMOD_DECL(help, help_module, NULL,
+			"Print help",
+			"Usage: embox-help [command]\n"
+			"Print help on specified command. If no command is specified print\n"
+			"common help.")
