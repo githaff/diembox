@@ -1,7 +1,9 @@
 set (SOURCES
+  cat.c
   help.c
   main.c)
 set (HEADERS
+  common.h
   main-info.h)
 
 configure_file(config.h.in config.h @ONLY)
