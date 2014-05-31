@@ -52,6 +52,8 @@ else ()
   endif ()
 endif ()
 
+
+
 ### Project directories
 ## Build product directories
 set (BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
@@ -61,6 +63,11 @@ set (SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 if (NOT EXISTS "${BUILD_DIR}")
   file (MAKE_DIRECTORY "${BUILD_DIR}")
 endif()
+
+## Installation paths if not specified
+if (NOT DEFINED CMAKE_INSTALL_BINDIR)
+  set (CMAKE_INSTALL_BINDIR "bin")
+endif (NOT DEFINED CMAKE_INSTALL_BINDIR)
 
 add_subdirectory (${SRC_DIR})
 

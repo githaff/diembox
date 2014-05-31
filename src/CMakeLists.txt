@@ -16,3 +16,6 @@ set_target_properties (${PROJECT}
 find_package (extopts)
 include_directories(${EXTOPTS_INCLUDE_DIR})
 target_link_libraries (${PROJECT} ${EXTOPTS_LIBRARY})
+
+### Install rules
+install (TARGETS ${PROJECT} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
