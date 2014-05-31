@@ -4,6 +4,8 @@ set (SOURCES
 set (HEADERS
   main-info.h)
 
+configure_file(config.h.in config.h @ONLY)
+
 add_executable (${PROJECT}
   ${SOURCES} ${HEADERS})
 

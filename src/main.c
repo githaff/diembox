@@ -4,8 +4,11 @@
 #include <extopts/extopts.h>
 #include <extopts/extmods.h>
 
+#include "config.h"
 #include "main-info.h"
 
+
+char embox_name[] = "embox";
 
 void embox_usage(void)
 {
@@ -23,12 +26,17 @@ void embox_usage(void)
 	extopts_usage(embox_opts);
 }
 
-int opts_help;
+void embox_version(void)
+{
+	printf("Embox utilities toolset %s\n", EMBOX_VERSION_FULL);
+}
 
-char embox_name[] = "embox";
+int opts_help;
+int opts_version;
 
 struct extopt embox_opts[] = {
 	EXTOPTS_HELP(&opts_help),
+	EXTOPTS_VERSION(&opts_version),
 	EXTOPTS_END
 };
 
@@ -63,6 +71,10 @@ int main(int argc, char *argv[])
 
 		if (opts_help) {
 			embox_usage();
+			goto end;
+		}
+		if (opts_version) {
+			embox_version();
 			goto end;
 		}
 	}
