@@ -32,11 +32,11 @@ if ("${GIT_TAG_VERSION}" STREQUAL "")
   set (EMBOX_VERSION_FULL "unknown")
 else ()
   execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/^v\\([[:digit:]]\\)\\..*/\\1/p"
+    COMMAND sed -ne "s/^v\\([[:digit:]]*\\)\\..*/\\1/p"
     OUTPUT_VARIABLE EMBOX_VERSION_MAJOR
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/^v[[:digit:]]\\.\\([[:digit:]]\\).*/\\1/p"
+    COMMAND sed -ne "s/^v[[:digit:]]*\\.\\([[:digit:]]*\\).*/\\1/p"
     OUTPUT_VARIABLE EMBOX_VERSION_MINOR
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND echo "${GIT_TAG_VERSION}"
