@@ -36,7 +36,7 @@ else ()
     OUTPUT_VARIABLE EMBOX_VERSION_MAJOR
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/^v[[:digit:]]\\.\\([[:digit:]]\\)\\..*/\\1/p"
+    COMMAND sed -ne "s/^v[[:digit:]]\\.\\([[:digit:]]\\).*/\\1/p"
     OUTPUT_VARIABLE EMBOX_VERSION_MINOR
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process (COMMAND echo "${GIT_TAG_VERSION}"
@@ -51,7 +51,6 @@ else ()
     set (EMBOX_VERSION_FULL "${EMBOX_VERSION}-${EMBOX_VERSION_DIRT}")
   endif ()
 endif ()
-
 
 
 ### Project directories
