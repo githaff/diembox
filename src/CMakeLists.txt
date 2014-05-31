@@ -1,8 +1,11 @@
 set (SOURCES
+  help.c
   main.c)
+set (HEADERS
+  main-info.h)
 
 add_executable (${PROJECT}
-  ${SOURCES})
+  ${SOURCES} ${HEADERS})
 
 set_target_properties (${PROJECT}
   PROPERTIES

@@ -4,12 +4,10 @@
 #include <extopts/extopts.h>
 #include <extopts/extmods.h>
 
+#include "main-info.h"
 
-struct extopt opts[];
 
-char embox_name[] = "embox";
-int embox_name_len = sizeof(embox_name);
-void embox_usage()
+void embox_usage(void)
 {
 	printf("Usage: %s [OPTIONS] COMMAND [COMMAND_OPTIONS]\n"
 		   "Embedded developer toolbox.\n"
@@ -22,15 +20,18 @@ void embox_usage()
 	extmods_usage_list();
 	printf("\n");
 	printf("Options:\n");
-	extopts_usage(opts);
+	extopts_usage(embox_opts);
 }
 
 int opts_help;
 
-struct extopt opts[] = {
+char embox_name[] = "embox";
+
+struct extopt embox_opts[] = {
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_END
 };
+
 
 int main(int argc, char *argv[])
 {
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 
 	execname = basename(argv[0]);
 
-	if (!strncmp(execname, embox_name, embox_name_len)) {
+	if (!strcmp(execname, embox_name)) {
 		if (argc > 1)
 			module = extmod_find(argv[1]);
 	}
@@ -56,12 +57,12 @@ int main(int argc, char *argv[])
 	if (module)
 		ret = extmod_exec(argc, argv, module);
 	else {
-		ret = extopts_get(&argc, argv, opts);
+		ret = extopts_get(&argc, argv, embox_opts);
 		if (ret)
 			goto err;
 
 		if (opts_help) {
-			embox_usage(opts);
+			embox_usage();
 			goto end;
 		}
 	}
@@ -72,38 +73,3 @@ end:
 err:
 	return ret;
 }
-
-int help_module(int argc, char *argv[])
-{
-	struct extmod *module;
-	int ret = 0;
-
-	if (argc > 1)
-		module = extmod_find(argv[1]);
-	else {
-		embox_usage();
-		goto end;
-	}
-
-	if (module) {
-		extmod_print_desc(module);
-		if (extmod_has_opts(module)) {
-			printf("\n");
-			printf("Options:\n");
-			extmod_print_opts(module);
-		}
-	}
-	else {
-		fprintf(stderr, "Error: module %s is not found\n", argv[1]);
-		ret = 1;
-	}
-
-end:
-	return ret;
-}
-
-EXTMOD_DECL(help, help_module, NULL,
-			"Print help",
-			"Usage: embox-help [command]\n"
-			"Print help on specified command. If no command is specified print\n"
-			"common help.")
