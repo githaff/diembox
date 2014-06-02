@@ -98,7 +98,10 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"Usage: embox-tobin [OPTION]... EXPRESSION\n"
 			"This utility implements basic binary calculator functions\n"
 			"with central ability to output result of expression in readable\n"
-			"binary form. It works only with integer data types.\n"
+			"binary form.\n"
+			"Options:\n"
+			"[[OPTIONS]]\n"    /* TODO: add into extopts options insertion into this place */
+			"It works only with integer data types.\n"
 			"Supported operators: +, -, /, %, <<, >>, (, )\n"
 			"Supported types:\n"
 			"  8s  - signed   8-bit\n"
