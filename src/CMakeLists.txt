@@ -1,4 +1,5 @@
 set (SOURCES
+  tobin.c
   cat.c
   help.c
   main.c)
