@@ -96,11 +96,11 @@ end:
 EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"Binary calculator",
 			"Usage: embox-tobin [OPTION]... EXPRESSION\n"
-			"This utility implements basic binary calculator functions\n"
-			"with central ability to output result of expression in readable\n"
-			"binary form.\n"
+			"This utility implements basic binary calculator functions with central ability\n"
+			"to output result of expression in readable binary form.\n"
+			"\n"
 			"Options:\n"
-			"[[OPTIONS]]\n"    /* TODO: add into extopts options insertion into this place */
+			"[[OPTIONS]]\n"
 			"It works only with integer data types.\n"
 			"Supported operators: +, -, /, %, <<, >>, (, )\n"
 			"Supported types:\n"
@@ -112,5 +112,10 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"  32u - unsigned 32-bit\n"
 			"  64s - signed   64-bit\n"
 			"  64u - unsigned 64-bit\n"
-			"Data type for each used value can be specified in () right\n"
-			"before the value itself\n")
+			"Data type for each used value can be specified in () right before the value\n"
+			"itself.\n"
+			"\n"
+			"Examples:\n"
+			"$ embox-tobin 0xee488f120\n"
+			"$ embox-tobin \"4 + 8 << (2 - 1)\"\n"
+			"$ embox-tobin (s16)0x52ea \"(s32)((u16)0x18 << 5) + 0x8937ffee\"")

@@ -16,14 +16,8 @@ int help_module(int argc, char *argv[])
 		goto end;
 	}
 
-	if (module) {
+	if (module)
 		extmod_print_desc(module);
-		if (extmod_has_opts(module)) {
-			printf("\n");
-			printf("Options:\n");
-			extmod_print_opts(module);
-		}
-	}
 	else {
 		fprintf(stderr, "Error: module %s is not found\n", argv[1]);
 		ret = 1;
