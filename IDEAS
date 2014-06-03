@@ -1,0 +1,3 @@
+* Easy registers compare. Diff between group of "ok" and "fail" cases
+  to first extract common features between "ok", between "fail" and
+  than - compare this two sets
