@@ -49,22 +49,17 @@ int main(int argc, char *argv[])
 
 	execname = basename(argv[0]);
 
-	if (!strcmp(execname, embox_name)) {
-		if (argc > 1)
-			module = extmod_find(argv[1]);
-	}
-	else {
-		module = extmod_find(execname);
-		if (!module) {
-			char buf[1024];
-			sprintf(buf, "%s.%s", embox_name, execname);
-			module = extmod_find(buf);
-		}
-	}
+	module = extmod_extract(&argc, argv);
 
 	if (module)
 		ret = extmod_exec(argc, argv, module);
 	else {
+		if (strcmp(execname, embox_name)) {
+			fprintf(stderr, "%s: module not found\n", execname);
+			ret = 1;
+			goto err;
+		}
+
 		ret = extopts_get(&argc, argv, embox_opts);
 		if (ret)
 			goto err;
@@ -80,8 +75,6 @@ int main(int argc, char *argv[])
 	}
 
 end:
-	return ret;
-
 err:
 	return ret;
 }
