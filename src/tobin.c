@@ -4,6 +4,7 @@
 #include <extopts/extmods.h>
 
 #include "common.h"
+#include "tobin.h"
 
 
 int opts_help;
@@ -27,10 +28,16 @@ void tobin_help(void)
 
 int eval(char *exp)
 {
-	return strtol(exp, NULL, 0);
+	int result;
+	struct symbol_queue *rpn;
+
+	rpn = expr_parse(exp);
+	result = rpn_eval(rpn);
+
+	return result;
 }
 
-char *byte_str(u8 byte)
+char *byte_str(u8_t byte)
 {
 	static char str[] = "0000 0000";
 
@@ -54,7 +61,7 @@ void print_8(int val)
 
 void print_16(int val)
 {
-	u8 *bytes = (u8*)&val;
+	u8_t *bytes = (u8_t*)&val;
 
 	puts("15      8  7       0");
 	printf("%s  ", byte_str(bytes[1]));
@@ -64,7 +71,7 @@ void print_16(int val)
 void print_32(int val)
 {
 	printf("val=%d\n", val);
-	u8 *bytes = (u8*)&val;
+	u8_t *bytes = (u8_t*)&val;
 
 	puts("31     24  23     16");
 	printf("%s  ", byte_str(bytes[3]));
@@ -76,7 +83,7 @@ void print_32(int val)
 
 void print_64(int val)
 {
-	u8 *bytes = (u8*)&val;
+	u8_t *bytes = (u8_t*)&val;
 
 	puts("63     56  55     48");
 	printf("%s  ", byte_str(bytes[7]));

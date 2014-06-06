@@ -1,10 +1,12 @@
 set (SOURCES
   tobin.c
+  tobin-calc.c
   cat.c
   help.c
   main.c)
 set (HEADERS
   common.h
+  tobin.h
   main-info.h)
 
 configure_file(config.h.in config.h @ONLY)
