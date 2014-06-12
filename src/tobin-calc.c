@@ -138,32 +138,6 @@ void print_state(char *token, struct symbol_queue *out,
 	print_stack(stack);
 }
 
-struct symbol *symbol_create(char *token)
-{
-	int i;
-	struct symbol *s;
-
-	s = calloc(1, sizeof(struct symbol));
-
-	for (i = 0; i < ARRAY_SIZE(ops); i++)
-	{
-		if (!strcmp(ops[i].str, token)) {
-			s->type = OPERATOR;
-			s->op = ops[i].type;
-			break;
-		}
-	}
-
-	if (s->type == NONE) {
-		s->type = INTVAL;
-		/* TODO: parse type specification if presen */
-		s->val.type = S32;
-		s->val.s32 = strtol(token, NULL, 0);
-	}
-
-	return s;
-}
-
 struct symbol_queue *symbol_queue_create()
 {
 	return calloc(1, sizeof(struct symbol_queue));
