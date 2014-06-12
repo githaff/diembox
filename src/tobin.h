@@ -5,7 +5,7 @@
 
 
 struct intval {
-	enum { S8, U8, S16, U16, S32, U32, S64, U64 } type;
+	enum intval_type { INVAL = 0, S8, U8, S16, U16, S32, U32, S64, U64 } type;
 	union {
 		s8_t  s8;
 		u8_t  u8;
@@ -18,8 +18,11 @@ struct intval {
 	};
 };
 
+#define DEFAULT_INTVAL_TYPE S32
+
 enum operator { PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R,
-				AND, XOR, OR, PAR_L, PAR_R };
+				AND, XOR, OR, PAR_L, PAR_R,
+				OP_S8, OP_U8, OP_S16, OP_U16, OP_S32, OP_U32, OP_S64, OP_U64 };
 
 struct opdesc {
 	enum operator type;

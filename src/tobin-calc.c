@@ -22,6 +22,32 @@ struct opdesc ops[] = {
 	OPDESC(PAR_R,   9, ")"),
 };
 
+struct opdesc ops_type[] = {
+	OPDESC(S8,  1, "(s8)"),
+	OPDESC(U8,  1, "(u8)"),
+	OPDESC(S16, 1, "(s16)"),
+	OPDESC(U16, 1, "(u16)"),
+	OPDESC(S32, 1, "(s32)"),
+	OPDESC(U32, 1, "(u32)"),
+	OPDESC(S64, 1, "(s64)"),
+	OPDESC(U64, 1, "(u64)"),
+};
+
+enum intval_type op_to_type(enum operator op)
+{
+	switch (op) {
+	case OP_S8  : return S8;
+	case OP_U8  : return U8;
+	case OP_S16 : return S16;
+	case OP_U16 : return U16;
+	case OP_S32 : return S32;
+	case OP_U32 : return U32;
+	case OP_S64 : return S64;
+	case OP_U64 : return U64;
+	default     : return INVAL;
+	}
+}
+
 
 int prior(struct symbol *s)
 {
@@ -180,9 +206,19 @@ int char_in_set(char symb, char *set)
 	return 0;
 }
 
-char *extract_intstr(char **str_orig, char *buf)
+enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
+	enum intval_type type = DEFAULT_INTVAL_TYPE;
+	int i;
+
+	for (i = 1; i < ARRAY_SIZE(ops_type); i++)
+	{
+		if (!strcmp_part(&str, ops_type[i].str)) {
+			type = ops_type[i].type;
+			break;
+		}
+	}
 
 	if (*str == '-') {
 		*buf = *str;
@@ -201,9 +237,8 @@ char *extract_intstr(char **str_orig, char *buf)
 		}
 
 		/* Incorrect integer */
-		if (!char_in_set(*str, "1234567890xabcdefABCDEF")) {
-			return NULL;
-		}
+		if (!char_in_set(*str, "1234567890xabcdefABCDEF"))
+			return INVAL;
 
 		*buf = *str;
 		str++;
@@ -212,11 +247,11 @@ char *extract_intstr(char **str_orig, char *buf)
 	*buf = 0;
 
 	if (str == *str_orig)
-		return NULL;
+		return INVAL;
 	else
 		*str_orig = str;
 
-	return buf;
+	return type;
 }
 
 
@@ -237,11 +272,38 @@ int strcmp_part(char **whole_orig, char *part)
 	return 0;
 }
 
+int read_val(char *valstr, struct symbol *s)
+{
+	int ret = 1;
+	char *endptr;
+
+	if (s->type != INTVAL)
+		return 0;
+
+	switch (s->val.type) {
+	case S8  : s->val.s8  = strtoll(valstr, &endptr, 0); break;
+	case U8  : s->val.u8  = strtoll(valstr, &endptr, 0); break;
+	case S16 : s->val.s16 = strtoll(valstr, &endptr, 0); break;
+	case U16 : s->val.u16 = strtoll(valstr, &endptr, 0); break;
+	case S32 : s->val.s32 = strtoll(valstr, &endptr, 0); break;
+	case U32 : s->val.u32 = strtoll(valstr, &endptr, 0); break;
+	case S64 : s->val.s64 = strtoll(valstr, &endptr, 0); break;
+	case U64 : s->val.u64 = strtoll(valstr, &endptr, 0); break;
+	default : break;
+	}
+
+	if (*endptr)
+		ret = 0;
+
+	return ret;
+}
+
 struct symbol *symbol_extract(char **str_orig)
 {
 	char *str = *str_orig;
 	struct symbol *s;
 	char buf[256];
+	enum intval_type type;
 	int i;
 
 	while (*str == ' ')
@@ -253,9 +315,14 @@ struct symbol *symbol_extract(char **str_orig)
 	s = calloc(1, sizeof(struct symbol));
 	s->type = NONE;
 
-	if (extract_intstr(&str, buf)) {
+	type = extract_intstr(&str, buf);
+	if (type) {
 		s->type = INTVAL;
-		s->val.s32 = strtol(buf, NULL, 0);
+		s->val.type = type;
+		if (!read_val(buf, s)) {
+			printf("Error: invalid integer symbol '%s'\n", buf);
+			s->type = NONE;
+		}
 		goto ret_symbol;
 	}
 
