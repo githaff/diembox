@@ -182,11 +182,124 @@ char *strdup(char *str)
 	return str_new;
 }
 
-
-struct symbol_queue *expr_parse(char *str_orig)
+int char_in_ops(char symb)
 {
-	char *token;
-	char *str;
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(ops); i++)
+	{
+		if (symb == ops[i].str[0])
+			return 1;
+	}
+
+	return 0;
+}
+
+int char_in_set(char symb, char *set)
+{
+	while (*set) {
+		if (symb == *set)
+			return 1;
+		set++;
+	}
+
+	return 0;
+}
+
+char *extract_intstr(char **str_orig, char *buf)
+{
+	char *str = *str_orig;
+
+	if (*str == '-') {
+		*buf = *str;
+		buf++;
+		str++;
+	}
+
+	while (*str) {
+		/* Correct intstr termination - operation*/
+		if (char_in_ops(*str)) {
+			break;
+		}
+		/* Correct intstr termination - whitespace*/
+		if (char_in_set(*str, " ")) {
+			break;
+		}
+
+		/* Incorrect integer */
+		if (!char_in_set(*str, "1234567890xabcdefABCDEF")) {
+			return NULL;
+		}
+
+		*buf = *str;
+		str++;
+		buf++;
+	}
+	*buf = 0;
+
+	*str_orig = str;
+
+	return buf;
+}
+
+
+int strcmp_part(char **whole_orig, char *part)
+{
+	char *whole = *whole_orig;
+
+	while (*part) {
+		if (*whole != *part)
+			return 1;
+
+		part++;
+		whole++;
+	}
+
+	*whole_orig = whole;
+
+	return 0;
+}
+
+struct symbol *symbol_extract(char **str_orig)
+{
+	char *str = *str_orig;
+	struct symbol *s;
+	char buf[256];
+	int i;
+
+	while (*str == ' ')
+		str++;
+
+	if (*str == 0)
+		return 0;
+
+	s = calloc(1, sizeof(struct symbol));
+	s->type = NONE;
+
+	for (i = 0; i < ARRAY_SIZE(ops); i++)
+	{
+		if (!strcmp_part(&str, ops[i].str)) {
+			s->type = OPERATOR;
+			s->op = ops[i].type;
+			goto ret_symbol;
+		}
+	}
+
+	if (s->type == NONE) {
+		if (!extract_intstr(&str, buf))
+			return s;
+		s->type = INTVAL;
+		s->val.s32 = strtol(buf, NULL, 0);
+	}
+
+ret_symbol:
+	*str_orig = str;
+
+	return s;
+}
+
+struct symbol_queue *expr_parse(char *str)
+{
 	struct symbol_queue *out;
 	struct symbol_stack *stack;
 	struct symbol *s;
@@ -194,12 +307,13 @@ struct symbol_queue *expr_parse(char *str_orig)
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
 
-	str = strdup(str_orig);
-
 	printf("Initial string: %s\n", str);
-	token = strtok(str, " ");
-	while (token) {
-		s = symbol_create(token);
+	s = symbol_extract(&str);
+	while (s) {
+		if (s->type == NONE) {
+			printf("Error: incorrect symbol at '%s'\n", str);
+			exit(1);
+		}
 
 		if (s->type == INTVAL)
 			symbol_queue_add(out, s);
@@ -235,7 +349,7 @@ struct symbol_queue *expr_parse(char *str_orig)
 			}
 		}
 
-		token = strtok(NULL, " ");
+		s = symbol_extract(&str);
 	}
 
 	s = symbol_stack_pull(stack);
@@ -244,7 +358,6 @@ struct symbol_queue *expr_parse(char *str_orig)
 		s = symbol_stack_pull(stack);
 	}
 
-	free(str);
 	free(stack);
 
 	return out;
