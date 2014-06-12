@@ -8,16 +8,24 @@
 
 
 struct opdesc ops[] = {
-	OPDESC(MULT,    1, "*"),
-	OPDESC(DIV,     1, "/"),
-	OPDESC(REST,    1, "%"),
-	OPDESC(PLUS,    2, "+"),
-	OPDESC(MINUS,   2, "-"),
-	OPDESC(SHIFT_L, 3, "<<"),
-	OPDESC(SHIFT_R, 3, ">>"),
-	OPDESC(AND,     4, "&"),
-	OPDESC(XOR,     5, "^"),
-	OPDESC(OR,      6, "|"),
+	OPDESC(OP_S8,   1, "(s8)"),
+	OPDESC(OP_U8,   1, "(u8)"),
+	OPDESC(OP_S16,  1, "(s16)"),
+	OPDESC(OP_U16,  1, "(u16)"),
+	OPDESC(OP_S32,  1, "(s32)"),
+	OPDESC(OP_U32,  1, "(u32)"),
+	OPDESC(OP_S64,  1, "(s64)"),
+	OPDESC(OP_U64,  1, "(u64)"),
+	OPDESC(MULT,    2, "*"),
+	OPDESC(DIV,     2, "/"),
+	OPDESC(REST,    2, "%"),
+	OPDESC(PLUS,    3, "+"),
+	OPDESC(MINUS,   3, "-"),
+	OPDESC(SHIFT_L, 4, "<<"),
+	OPDESC(SHIFT_R, 4, ">>"),
+	OPDESC(AND,     5, "&"),
+	OPDESC(XOR,     6, "^"),
+	OPDESC(OR,      7, "|"),
 	OPDESC(PAR_L,   9, "("),
 	OPDESC(PAR_R,   9, ")"),
 };
@@ -32,22 +40,6 @@ struct opdesc ops_type[] = {
 	OPDESC(S64, 1, "(s64)"),
 	OPDESC(U64, 1, "(u64)"),
 };
-
-enum intval_type op_to_type(enum operator op)
-{
-	switch (op) {
-	case OP_S8  : return S8;
-	case OP_U8  : return U8;
-	case OP_S16 : return S16;
-	case OP_U16 : return U16;
-	case OP_S32 : return S32;
-	case OP_U32 : return U32;
-	case OP_S64 : return S64;
-	case OP_U64 : return U64;
-	default     : return INVAL;
-	}
-}
-
 
 int prior(struct symbol *s)
 {
@@ -211,6 +203,7 @@ enum intval_type extract_intstr(char **str_orig, char *buf)
 	char *str = *str_orig;
 	enum intval_type type = DEFAULT_INTVAL_TYPE;
 	int i;
+	int len = 0;
 
 	for (i = 1; i < ARRAY_SIZE(ops_type); i++)
 	{
@@ -243,10 +236,11 @@ enum intval_type extract_intstr(char **str_orig, char *buf)
 		*buf = *str;
 		str++;
 		buf++;
+		len++;
 	}
 	*buf = 0;
 
-	if (str == *str_orig)
+	if (!len)
 		return INVAL;
 	else
 		*str_orig = str;
@@ -432,6 +426,10 @@ int rpn_eval(struct symbol_queue *rpn)
 
 	s = rpn->first;
 	while (s) {
+		print_stack(stack);
+		print_queue(rpn);
+		printf("\n");
+
 		if (s->type == INTVAL) {
 			s_new = symbol_clone(s);
 			symbol_stack_push(stack, s_new);
