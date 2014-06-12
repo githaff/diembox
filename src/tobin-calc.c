@@ -198,6 +198,23 @@ int char_in_set(char symb, char *set)
 	return 0;
 }
 
+int strcmp_part(char **whole_orig, char *part)
+{
+	char *whole = *whole_orig;
+
+	while (*part) {
+		if (*whole != *part)
+			return 1;
+
+		part++;
+		whole++;
+	}
+
+	*whole_orig = whole;
+
+	return 0;
+}
+
 enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
@@ -246,24 +263,6 @@ enum intval_type extract_intstr(char **str_orig, char *buf)
 		*str_orig = str;
 
 	return type;
-}
-
-
-int strcmp_part(char **whole_orig, char *part)
-{
-	char *whole = *whole_orig;
-
-	while (*part) {
-		if (*whole != *part)
-			return 1;
-
-		part++;
-		whole++;
-	}
-
-	*whole_orig = whole;
-
-	return 0;
 }
 
 int read_val(char *valstr, struct symbol *s)
@@ -424,8 +423,11 @@ struct symbol *symbol_clone(struct symbol *s)
 	 (S->val.type == U32) ? S->val.u32 :		\
 	 (S->val.type == S64) ? S->val.s64 :		\
 	 (S->val.type == U64) ? S->val.u64 : 0)
-#define S_OP(S, S1, S2, OP)				\
-	S->val.s64 = ((S_INT(S1)) OP (S_INT(S2)))
+#define S_OP_BIN(S1, S2, OP)					\
+	S1->val.type = S64;							\
+	S1->val.s64 = ((S_INT(S2)) OP (S_INT(S1)))
+#define S_OP_TYP(S1, TYPE)				\
+	S1->val.s64 = (TYPE)(S_INT(S1))
 
 int rpn_eval(struct symbol_queue *rpn)
 {
@@ -446,28 +448,41 @@ int rpn_eval(struct symbol_queue *rpn)
 			s_new = symbol_clone(s);
 			symbol_stack_push(stack, s_new);
 		} else if (s->type == OPERATOR) {
-			int val;
-
-			s2 = symbol_stack_pull(stack);
 			s1 = symbol_stack_pull(stack);
-			if (!s1 || !s2) {
+			if (!s1) {
 				printf("Error: corrupted RPN evaluation stack\n");
 				exit(1);
 			}
 
 			s1->type = INTVAL;
 			switch (s->op) {
-			case MULT    : S_OP(s1, s1, s2, *);  break;
-			case DIV     : S_OP(s1, s1, s2, /);  break;
-			case REST    : S_OP(s1, s1, s2, %);  break;
-			case PLUS    : S_OP(s1, s1, s2, +);  break;
-			case MINUS   : S_OP(s1, s1, s2, -);  break;
-			case SHIFT_L : S_OP(s1, s1, s2, <<); break;
-			case SHIFT_R : S_OP(s1, s1, s2, >>); break;
-			case AND     : S_OP(s1, s1, s2, &);  break;
-			case XOR     : S_OP(s1, s1, s2, ^);  break;
-			case OR      : S_OP(s1, s1, s2, |);  break;
-			default      : val = -1;             break;
+			case OP_S8  : S_OP_TYP(s1, s8_t);  break;
+			case OP_U8  : S_OP_TYP(s1, u8_t);  break;
+			case OP_S16 : S_OP_TYP(s1, s16_t); break;
+			case OP_U16 : S_OP_TYP(s1, u16_t); break;
+			case OP_S32 : S_OP_TYP(s1, s32_t); break;
+			case OP_U32 : S_OP_TYP(s1, u32_t); break;
+			case OP_S64 : S_OP_TYP(s1, s64_t); break;
+			case OP_U64 : S_OP_TYP(s1, u64_t); break;
+			default :
+				s2 = symbol_stack_pull(stack);
+				if (!s2) {
+					printf("Error: corrupted RPN evaluation stack\n");
+					exit(1);
+				}
+				switch (s->op) {
+				case MULT    : S_OP_BIN(s1, s2, *);  break;
+				case DIV     : S_OP_BIN(s1, s2, /);  break;
+				case REST    : S_OP_BIN(s1, s2, %);  break;
+				case PLUS    : S_OP_BIN(s1, s2, +);  break;
+				case MINUS   : S_OP_BIN(s1, s2, -);  break;
+				case SHIFT_L : S_OP_BIN(s1, s2, <<); break;
+				case SHIFT_R : S_OP_BIN(s1, s2, >>); break;
+				case AND     : S_OP_BIN(s1, s2, &);  break;
+				case XOR     : S_OP_BIN(s1, s2, ^);  break;
+				case OR      : S_OP_BIN(s1, s2, |);  break;
+				default      : s->val.s32 = -1;      break;
+				}
 			}
 
 			symbol_stack_push(stack, s1);

@@ -18,7 +18,7 @@ struct intval {
 	};
 };
 
-#define DEFAULT_INTVAL_TYPE S32
+#define DEFAULT_INTVAL_TYPE S64
 
 enum operator { OP_S8, OP_U8, OP_S16, OP_U16, OP_S32, OP_U32, OP_S64, OP_U64,
 				PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R,
