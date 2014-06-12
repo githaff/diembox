@@ -211,7 +211,10 @@ char *extract_intstr(char **str_orig, char *buf)
 	}
 	*buf = 0;
 
-	*str_orig = str;
+	if (str == *str_orig)
+		return NULL;
+	else
+		*str_orig = str;
 
 	return buf;
 }
@@ -250,21 +253,25 @@ struct symbol *symbol_extract(char **str_orig)
 	s = calloc(1, sizeof(struct symbol));
 	s->type = NONE;
 
-	for (i = 0; i < ARRAY_SIZE(ops); i++)
-	{
-		if (!strcmp_part(&str, ops[i].str)) {
-			s->type = OPERATOR;
-			s->op = ops[i].type;
-			goto ret_symbol;
-		}
+	if (extract_intstr(&str, buf)) {
+		s->type = INTVAL;
+		s->val.s32 = strtol(buf, NULL, 0);
+		goto ret_symbol;
 	}
 
 	if (s->type == NONE) {
-		if (!extract_intstr(&str, buf))
-			return s;
-		s->type = INTVAL;
-		s->val.s32 = strtol(buf, NULL, 0);
+		for (i = 0; i < ARRAY_SIZE(ops); i++)
+		{
+			if (!strcmp_part(&str, ops[i].str)) {
+				s->type = OPERATOR;
+				s->op = ops[i].type;
+				goto ret_symbol;
+			}
+		}
 	}
+
+	s->type = NONE;
+	return s;
 
 ret_symbol:
 	*str_orig = str;
