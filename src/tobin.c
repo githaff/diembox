@@ -170,10 +170,6 @@ int tobin_main(int argc, char *argv[])
 	int ret = 0;
 	int i;
 
-	for (i = 0; i < argc; i++)
-		printf("%s\n", argv[i]);
-
-	
 	ret = extopts_get(&argc, argv, tobin_opts);
 	if (opts_help) {
 		tobin_help();

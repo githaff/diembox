@@ -441,10 +441,6 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 
 	s = rpn->first;
 	while (s) {
-		print_stack(stack);
-		print_queue(rpn);
-		printf("\n");
-
 		if (s->type == INTVAL) {
 			s_new = symbol_clone(s);
 			symbol_stack_push(stack, s_new);
