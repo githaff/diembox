@@ -218,7 +218,7 @@ int strcmp_part(char **whole_orig, char *part)
 enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
-	enum intval_type type = DEFAULT_INTVAL_TYPE;
+	enum intval_type type = default_initval_type;
 	int i;
 	int len = 0;
 
@@ -424,17 +424,18 @@ struct symbol *symbol_clone(struct symbol *s)
 	 (S->val.type == S64) ? S->val.s64 :		\
 	 (S->val.type == U64) ? S->val.u64 : 0)
 #define S_OP_BIN(S1, S2, OP)					\
-	S1->val.type = S64;							\
+	S1->val.type = default_initval_type;		\
 	S1->val.s64 = ((S_INT(S2)) OP (S_INT(S1)))
-#define S_OP_TYP(S1, TYPE)				\
-	S1->val.s64 = (TYPE)(S_INT(S1))
+#define S_OP_TYP(S1, TYPE, TYPE_ID)				\
+	S1->val.type = TYPE_ID;						\
+	S1->val.TYPE = (TYPE##_t)(S_INT(S1))
 
-int rpn_eval(struct symbol_queue *rpn)
+struct intval rpn_eval(struct symbol_queue *rpn)
 {
 	struct symbol *s, *s_new;
 	struct symbol *s1, *s2;
 	struct symbol_stack *stack;
-	int ret;
+	struct intval intval;
 
 	stack = symbol_stack_create();
 
@@ -456,14 +457,14 @@ int rpn_eval(struct symbol_queue *rpn)
 
 			s1->type = INTVAL;
 			switch (s->op) {
-			case OP_S8  : S_OP_TYP(s1, s8_t);  break;
-			case OP_U8  : S_OP_TYP(s1, u8_t);  break;
-			case OP_S16 : S_OP_TYP(s1, s16_t); break;
-			case OP_U16 : S_OP_TYP(s1, u16_t); break;
-			case OP_S32 : S_OP_TYP(s1, s32_t); break;
-			case OP_U32 : S_OP_TYP(s1, u32_t); break;
-			case OP_S64 : S_OP_TYP(s1, s64_t); break;
-			case OP_U64 : S_OP_TYP(s1, u64_t); break;
+			case OP_S8  : S_OP_TYP(s1, s8,  S8);  break;
+			case OP_U8  : S_OP_TYP(s1, u8,  U8);  break;
+			case OP_S16 : S_OP_TYP(s1, s16, S16); break;
+			case OP_U16 : S_OP_TYP(s1, u16, U16); break;
+			case OP_S32 : S_OP_TYP(s1, s32, S32); break;
+			case OP_U32 : S_OP_TYP(s1, u32, U32); break;
+			case OP_S64 : S_OP_TYP(s1, s64, S64); break;
+			case OP_U64 : S_OP_TYP(s1, u64, U64); break;
 			default :
 				s2 = symbol_stack_pull(stack);
 				if (!s2) {
@@ -499,9 +500,13 @@ int rpn_eval(struct symbol_queue *rpn)
 	}
 
 	s = symbol_stack_pull(stack);
-	ret = s->val.s32;
+	if (s->type != INTVAL) {
+		printf("Error: RPN evaluation result is not intval\n");
+		exit(1);
+	}
+	intval = s->val;
 
 	free(stack);
 
-	return ret;
+	return intval;
 }

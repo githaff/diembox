@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <extopts/extopts.h>
 #include <extopts/extmods.h>
 
@@ -7,14 +8,22 @@
 #include "tobin.h"
 
 
+enum intval_type default_initval_type;
+
 int opts_help;
+const char *opts_type = "s32";
 
 struct extopt tobin_opts[] = {
 /*
   Options TODO:
-  -o TYPE, --out TYPE - output value datatype
   -d, --diff          - show xor-difference between two first expression results
  */
+	{
+		.name_long = "type",
+		.name_short = 't',
+		EXTOPT_ARG_STR("TYPE", &opts_type),
+		.desc = "internal data type (s32 is default)",
+	},
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_END
 };
@@ -26,9 +35,40 @@ void tobin_help(void)
 	extmod_print_opts(extmod);
 }
 
-int eval(char *exp)
+enum intval_type parse_intval_type(const char *str)
 {
-	int result;
+	if (!strcmp(str, "s8"))
+		return S8;
+	else if (!strcmp(str, "u8"))
+		return U8;
+	else if (!strcmp(str, "s16"))
+		return S16;
+	else if (!strcmp(str, "u16"))
+		return U16;
+	else if (!strcmp(str, "s32"))
+		return S32;
+	else if (!strcmp(str, "u32"))
+		return U32;
+	else if (!strcmp(str, "s64"))
+		return S64;
+	else if (!strcmp(str, "u64"))
+		return U64;
+	return INVAL;
+}
+
+void enforce_typecast(struct symbol_queue *rpn, enum operator op)
+{
+	struct symbol *s;
+	s = calloc(1, sizeof(struct symbol));
+	s->type = OPERATOR;
+	s->op = op;
+	rpn->last->next = s;
+	rpn->last = s;
+}
+
+struct intval eval(char *exp)
+{
+	struct intval result;
 	struct symbol_queue *rpn;
 
 	rpn = expr_parse(exp);
@@ -53,13 +93,13 @@ char *byte_str(u8_t byte)
 	return str;
 }
 
-void print_8(int val)
+void print_8(u8_t val)
 {
 	puts("7       0");
 	printf("%s\n", byte_str(val));
 }
 
-void print_16(int val)
+void print_16(u16_t val)
 {
 	u8_t *bytes = (u8_t*)&val;
 
@@ -68,7 +108,7 @@ void print_16(int val)
 	printf("%s\n", byte_str(bytes[0]));
 }
 
-void print_32(int val)
+void print_32(u32_t val)
 {
 	printf("val=%d\n", val);
 	u8_t *bytes = (u8_t*)&val;
@@ -81,14 +121,14 @@ void print_32(int val)
 	printf("%s\n", byte_str(bytes[0]));
 }
 
-void print_64(int val)
+void print_64(u64_t val)
 {
 	u8_t *bytes = (u8_t*)&val;
 
 	puts("63     56  55     48");
 	printf("%s  ", byte_str(bytes[7]));
 	printf("%s\n", byte_str(bytes[6]));
-	puts("47      40  39       32");
+	puts("47     40  39     32");
 	printf("%s  ", byte_str(bytes[5]));
 	printf("%s\n", byte_str(bytes[4]));
 	puts("31     24  23     16");
@@ -99,24 +139,51 @@ void print_64(int val)
 	printf("%s\n", byte_str(bytes[0]));
 }
 
+void print_intval(struct intval val)
+{
+	switch (val.type) {
+	case S8 :
+	case U8 :
+		print_8(val.u8);
+		break;
+	case S16 :
+	case U16 :
+		print_16(val.u16);
+		break;
+	case S32 :
+	case U32 :
+		print_32(val.u32);
+		break;
+	case S64 :
+	case U64 :
+		print_64(val.u64);
+		break;
+	default:
+		printf("-invalid-intval-\n");
+	}
+}
+
+
 int tobin_main(int argc, char *argv[])
 {
+	struct intval result;
 	int ret = 0;
-	int result;
 	int i;
 
 	for (i = 0; i < argc; i++)
 		printf("%s\n", argv[i]);
 
+	
 	ret = extopts_get(&argc, argv, tobin_opts);
 	if (opts_help) {
 		tobin_help();
 		goto end;
 	}
+	default_initval_type = parse_intval_type(opts_type);
 
 	for (i = 0; i < argc; i++) {
 		result = eval(argv[i]);
-		print_32(result);
+		print_intval(result);
 		if (i > 0)
 			printf("\n");
 	}

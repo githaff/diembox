@@ -18,7 +18,7 @@ struct intval {
 	};
 };
 
-#define DEFAULT_INTVAL_TYPE S64
+extern enum intval_type default_initval_type;
 
 enum operator { OP_S8, OP_U8, OP_S16, OP_U16, OP_S32, OP_U32, OP_S64, OP_U64,
 				PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R,
@@ -55,7 +55,7 @@ struct symbol_stack {
 
 struct symbol_queue *expr_parse(char *str_orig);
 void print_queue(struct symbol_queue *out);
-int rpn_eval(struct symbol_queue *rpn);
+struct intval rpn_eval(struct symbol_queue *rpn);
 
 
 #endif /* __TOBIN_H */
