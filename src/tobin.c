@@ -149,7 +149,7 @@ void print_intval(struct intval val)
 		print_64(val.u64);
 		break;
 	default:
-		printf("-invalid-intval-\n");
+		err_msg("invalid intval\n");
 	}
 }
 

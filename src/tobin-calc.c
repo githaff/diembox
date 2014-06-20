@@ -27,7 +27,7 @@ int prior(struct symbol *s)
 	if (s && s->type == OPERATOR)
 		return ops[s->op].prior;
 	else {
-		printf("Error: prioritet for invalid symbol requested\n");
+		err_msg("priority for invalid symbol requested\n");
 		return 0;
 	}
 }
@@ -74,28 +74,28 @@ void print_symbol(struct symbol *s)
 {
 	if (s->type == INTVAL)
 		/* TODO: fix for other integer types */
-		printf("%d", s->val.s32);
+		dbg_msg("%d", s->val.s32);
 	else if (s->type == OPERATOR)
-		printf("%s", ops[s->op].str);
+		dbg_msg("%s", ops[s->op].str);
 }
 
 void print_token(char *token)
 {
-	printf("Token: '%s'\n", token);
+	dbg_msg("Token: '%s'\n", token);
 }
 
 void print_queue(struct symbol_queue *out)
 {
 	struct symbol *s;
 
-	printf("Out:  ");
+	dbg_msg("Out:  ");
 	s = out->first;
 	while (s) {
-		printf(" ");
+		dbg_msg(" ");
 		print_symbol(s);
 		s = s->next;
 	}
-	printf("\n");
+	dbg_msg("\n");
 }
 
 void print_stack(struct symbol_stack *stack)
@@ -103,7 +103,7 @@ void print_stack(struct symbol_stack *stack)
 	struct symbol *s;
 	struct symbol *s_print;
 
-	printf("Stack:");
+	dbg_msg("Stack:");
 	s_print = stack->bottom;
 	if (s_print) {
 		fflush(stdout);
@@ -113,14 +113,14 @@ void print_stack(struct symbol_stack *stack)
 			while (s->next != s_print) {
 				s = s->next;
 			}
-			printf(" ");
+			dbg_msg(" ");
 			print_symbol(s_print);
 			s_print = s;
 		}
-		printf(" ");
+		dbg_msg(" ");
 		print_symbol(s_print);
 	}
-	printf("\n");
+	dbg_msg("\n");
 }
 
 
@@ -130,10 +130,10 @@ void print_state(char *token, struct symbol_queue *out,
 
 	print_token(token);
 
-	printf(" ");
+	dbg_msg(" ");
 	print_queue(out);
 
-	printf(" ");
+	dbg_msg(" ");
 	print_stack(stack);
 }
 
@@ -283,7 +283,7 @@ struct symbol *symbol_extract(char **str_orig)
 		s->type = INTVAL;
 		s->val.type = type;
 		if (!read_val(buf, s)) {
-			printf("Error: invalid integer symbol '%s'\n", buf);
+			err_msg("invalid integer symbol '%s'\n", buf);
 			s->type = NONE;
 		}
 		goto ret_symbol;
@@ -318,11 +318,10 @@ struct symbol_queue *expr_parse(char *str)
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
 
-	printf("Initial string: %s\n", str);
 	s = symbol_extract(&str);
 	while (s) {
 		if (s->type == NONE) {
-			printf("Error: incorrect symbol at '%s'\n", str);
+			err_msg("incorrect symbol at '%s'\n", str);
 			exit(1);
 		}
 
@@ -339,7 +338,7 @@ struct symbol_queue *expr_parse(char *str)
 				while (stack->top) {
 					top = symbol_stack_pull(stack);
 					if (!top) {
-						printf("Error: no opening parentheses found\n");
+						err_msg("no opening parentheses found\n");
 						exit(1);
 					}
 
@@ -417,7 +416,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 		} else if (s->type == OPERATOR) {
 			s1 = symbol_stack_pull(stack);
 			if (!s1) {
-				printf("Error: corrupted RPN evaluation stack\n");
+				err_msg("corrupted RPN evaluation stack\n");
 				exit(1);
 			}
 
@@ -427,7 +426,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 			default :
 				s2 = symbol_stack_pull(stack);
 				if (!s2) {
-					printf("Error: corrupted RPN evaluation stack\n");
+					err_msg("corrupted RPN evaluation stack\n");
 					exit(1);
 				}
 				switch (s->op) {
@@ -454,14 +453,14 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 	}
 
 	if (stack->top != stack->bottom) {
-		printf("Error: corrupted stack at finish stage\n");
+		err_msg("corrupted stack at finish stage\n");
 		print_stack(stack);
 		exit(1);
 	}
 
 	s = symbol_stack_pull(stack);
 	if (s->type != INTVAL) {
-		printf("Error: RPN evaluation result is not intval\n");
+		err_msg("RPN evaluation result is not intval\n");
 		exit(1);
 	}
 	intval = s->val;

@@ -15,5 +15,8 @@ typedef uint64_t u64_t;
 
 #define ARRAY_SIZE(ARRAY) (sizeof(ARRAY)/sizeof((ARRAY)[0]))
 
+#define err_msg(...) fprintf(stderr, "Error: " __VA_ARGS__)
+#define dbg_msg(...) fprintf(stderr, __VA_ARGS__)
+
 
 #endif /* __COMMON_H */
