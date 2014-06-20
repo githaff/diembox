@@ -20,8 +20,7 @@ struct intval {
 
 extern enum intval_type default_initval_type;
 
-enum operator { OP_S8, OP_U8, OP_S16, OP_U16, OP_S32, OP_U32, OP_S64, OP_U64,
-				PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R,
+enum operator { PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R,
 				AND, XOR, OR, PAR_L, PAR_R };
 
 struct opdesc {

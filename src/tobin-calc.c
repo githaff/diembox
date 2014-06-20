@@ -8,37 +8,18 @@
 
 
 struct opdesc ops[] = {
-	OPDESC(OP_S8,   1, "(s8)"),
-	OPDESC(OP_U8,   1, "(u8)"),
-	OPDESC(OP_S16,  1, "(s16)"),
-	OPDESC(OP_U16,  1, "(u16)"),
-	OPDESC(OP_S32,  1, "(s32)"),
-	OPDESC(OP_U32,  1, "(u32)"),
-	OPDESC(OP_S64,  1, "(s64)"),
-	OPDESC(OP_U64,  1, "(u64)"),
-	OPDESC(MULT,    2, "*"),
-	OPDESC(DIV,     2, "/"),
-	OPDESC(REST,    2, "%"),
-	OPDESC(PLUS,    3, "+"),
-	OPDESC(MINUS,   3, "-"),
-	OPDESC(SHIFT_L, 4, "<<"),
-	OPDESC(SHIFT_R, 4, ">>"),
-	OPDESC(AND,     5, "&"),
-	OPDESC(XOR,     6, "^"),
-	OPDESC(OR,      7, "|"),
+	OPDESC(MULT,    1, "*"),
+	OPDESC(DIV,     1, "/"),
+	OPDESC(REST,    1, "%"),
+	OPDESC(PLUS,    2, "+"),
+	OPDESC(MINUS,   2, "-"),
+	OPDESC(SHIFT_L, 3, "<<"),
+	OPDESC(SHIFT_R, 3, ">>"),
+	OPDESC(AND,     4, "&"),
+	OPDESC(XOR,     5, "^"),
+	OPDESC(OR,      6, "|"),
 	OPDESC(PAR_L,   9, "("),
 	OPDESC(PAR_R,   9, ")"),
-};
-
-struct opdesc ops_type[] = {
-	OPDESC(S8,  1, "(s8)"),
-	OPDESC(U8,  1, "(u8)"),
-	OPDESC(S16, 1, "(s16)"),
-	OPDESC(U16, 1, "(u16)"),
-	OPDESC(S32, 1, "(s32)"),
-	OPDESC(U32, 1, "(u32)"),
-	OPDESC(S64, 1, "(s64)"),
-	OPDESC(U64, 1, "(u64)"),
 };
 
 int prior(struct symbol *s)
@@ -219,16 +200,7 @@ enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
 	enum intval_type type = default_initval_type;
-	int i;
 	int len = 0;
-
-	for (i = 1; i < ARRAY_SIZE(ops_type); i++)
-	{
-		if (!strcmp_part(&str, ops_type[i].str)) {
-			type = ops_type[i].type;
-			break;
-		}
-	}
 
 	if (*str == '-') {
 		*buf = *str;
@@ -238,13 +210,11 @@ enum intval_type extract_intstr(char **str_orig, char *buf)
 
 	while (*str) {
 		/* Correct intstr termination - operation*/
-		if (char_in_ops(*str)) {
+		if (char_in_ops(*str))
 			break;
-		}
 		/* Correct intstr termination - whitespace*/
-		if (char_in_set(*str, " ")) {
+		if (char_in_set(*str, " "))
 			break;
-		}
 
 		/* Incorrect integer */
 		if (!char_in_set(*str, "1234567890xabcdefABCDEF"))
@@ -453,14 +423,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 
 			s1->type = INTVAL;
 			switch (s->op) {
-			case OP_S8  : S_OP_TYP(s1, s8,  S8);  break;
-			case OP_U8  : S_OP_TYP(s1, u8,  U8);  break;
-			case OP_S16 : S_OP_TYP(s1, s16, S16); break;
-			case OP_U16 : S_OP_TYP(s1, u16, U16); break;
-			case OP_S32 : S_OP_TYP(s1, s32, S32); break;
-			case OP_U32 : S_OP_TYP(s1, u32, U32); break;
-			case OP_S64 : S_OP_TYP(s1, s64, S64); break;
-			case OP_U64 : S_OP_TYP(s1, u64, U64); break;
+				/* One operand operators */
 			default :
 				s2 = symbol_stack_pull(stack);
 				if (!s2) {
@@ -468,6 +431,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 					exit(1);
 				}
 				switch (s->op) {
+					/* Two operand operators */
 				case MULT    : S_OP_BIN(s1, s2, *);  break;
 				case DIV     : S_OP_BIN(s1, s2, /);  break;
 				case REST    : S_OP_BIN(s1, s2, %);  break;

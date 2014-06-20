@@ -56,16 +56,6 @@ enum intval_type parse_intval_type(const char *str)
 	return INVAL;
 }
 
-void enforce_typecast(struct symbol_queue *rpn, enum operator op)
-{
-	struct symbol *s;
-	s = calloc(1, sizeof(struct symbol));
-	s->type = OPERATOR;
-	s->op = op;
-	rpn->last->next = s;
-	rpn->last = s;
-}
-
 struct intval eval(char *exp)
 {
 	struct intval result;
@@ -213,4 +203,4 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"Examples:\n"
 			"$ embox-tobin 0xee488f120\n"
 			"$ embox-tobin \"4 + 8 << (2 - 1)\"\n"
-			"$ embox-tobin (s16)0x52ea \"(s32)((u16)0x18 << 5) + 0x8937ffee\"")
+			"$ embox-tobin 0x52ea \"(0x18 << 5) + 0x8937ffee\"")
