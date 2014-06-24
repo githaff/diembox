@@ -8,16 +8,17 @@
 
 
 struct opdesc ops[] = {
-	OPDESC(MULT,    1, "*"),
-	OPDESC(DIV,     1, "/"),
-	OPDESC(REST,    1, "%"),
-	OPDESC(PLUS,    2, "+"),
-	OPDESC(MINUS,   2, "-"),
-	OPDESC(SHIFT_L, 3, "<<"),
-	OPDESC(SHIFT_R, 3, ">>"),
-	OPDESC(AND,     4, "&"),
-	OPDESC(XOR,     5, "^"),
-	OPDESC(OR,      6, "|"),
+	OPDESC(NEG,     1, "~"),
+	OPDESC(MULT,    2, "*"),
+	OPDESC(DIV,     2, "/"),
+	OPDESC(REST,    2, "%"),
+	OPDESC(PLUS,    3, "+"),
+	OPDESC(MINUS,   3, "-"),
+	OPDESC(SHIFT_L, 4, "<<"),
+	OPDESC(SHIFT_R, 4, ">>"),
+	OPDESC(AND,     5, "&"),
+	OPDESC(XOR,     6, "^"),
+	OPDESC(OR,      7, "|"),
 	OPDESC(PAR_L,   9, "("),
 	OPDESC(PAR_R,   9, ")"),
 };
@@ -318,6 +319,8 @@ struct symbol_queue *expr_parse(char *str)
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
 
+	printf("STR=%s\n", str);
+
 	s = symbol_extract(&str);
 	while (s) {
 		if (s->type == NONE) {
@@ -395,6 +398,9 @@ struct symbol *symbol_clone(struct symbol *s)
 #define S_OP_BIN(S1, S2, OP)					\
 	S1->val.type = default_initval_type;		\
 	S1->val.s64 = ((S_INT(S2)) OP (S_INT(S1)))
+#define S_OP_UNO(S1, OP)				\
+	S1->val.type = default_initval_type;		\
+	S1->val.s64 = (OP (S_INT(S1)))
 #define S_OP_TYP(S1, TYPE, TYPE_ID)				\
 	S1->val.type = TYPE_ID;						\
 	S1->val.TYPE = (TYPE##_t)(S_INT(S1))
@@ -422,6 +428,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 
 			s1->type = INTVAL;
 			switch (s->op) {
+			case NEG : S_OP_UNO(s1, ~);  break;
 				/* One operand operators */
 			default :
 				s2 = symbol_stack_pull(stack);
