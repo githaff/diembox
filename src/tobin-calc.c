@@ -147,7 +147,8 @@ struct symbol *symbol_create()
 
 void symbol_destroy(struct symbol *s)
 {
-	free(s);
+	if (s)
+		free(s);
 }
 
 struct symbol_queue *symbol_queue_create()
@@ -159,6 +160,9 @@ void symbol_queue_destroy(struct symbol_queue *queue)
 {
 	struct symbol *s;
 	struct symbol *s_next;
+
+	if (!queue)
+		return;
 
 	s = queue->first;
 	while (s && s != queue->last) {
@@ -181,6 +185,9 @@ void symbol_stack_destroy(struct symbol_stack *stack)
 {
 	struct symbol *s;
 	struct symbol *s_next;
+
+	if (!stack)
+		return;
 
 	s = stack->top;
 	while (s) {
@@ -351,6 +358,7 @@ struct symbol_queue *expr_parse(char *str)
 	struct symbol_queue *out;
 	struct symbol_stack *stack;
 	struct symbol *s;
+	struct symbol *top;
 
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
@@ -359,14 +367,12 @@ struct symbol_queue *expr_parse(char *str)
 	while (s) {
 		if (s->type == NONE) {
 			err_msg("incorrect symbol at '%s'\n", str);
-			exit(1);
+			goto err;
 		}
 
 		if (s->type == INTVAL)
 			symbol_queue_add(out, s);
 		else if (s->type == OPERATOR) {
-			struct symbol *top;
-
 			switch (s->op) {
 			case PAR_L :
 				symbol_stack_push(stack, s);
@@ -374,15 +380,15 @@ struct symbol_queue *expr_parse(char *str)
 			case PAR_R :
 				while (stack->top) {
 					top = symbol_stack_pull(stack);
-					if (!top) {
-						err_msg("no opening parentheses found\n");
-						exit(1);
-					}
 
-					if (top->op == PAR_L)
+					if (top && top->op == PAR_L)
 						break;
 					else
 						symbol_queue_add(out, top);
+				}
+				if (!stack->top && top->op != PAR_L) {
+					err_msg("no opening parentheses found\n");
+					goto err;
 				}
 				break;
 			default :
@@ -408,6 +414,13 @@ struct symbol_queue *expr_parse(char *str)
 	symbol_stack_destroy(stack);
 
 	return out;
+
+err:
+	symbol_destroy(s);
+	symbol_stack_destroy(stack);
+	symbol_queue_destroy(out);
+
+	return NULL;
 }
 
 struct symbol *symbol_clone(struct symbol *s)
@@ -457,7 +470,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 			s1 = symbol_stack_pull(stack);
 			if (!s1) {
 				err_msg("corrupted RPN evaluation stack\n");
-				exit(1);
+				goto err_s;
 			}
 
 			s1->type = INTVAL;
@@ -467,8 +480,8 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 			default :
 				s2 = symbol_stack_pull(stack);
 				if (!s2) {
-					err_msg("corrupted RPN evaluation stack\n");
-					exit(1);
+					err_msg("corrupted RPN evaluation stack - 2\n");
+					goto err_s;
 				}
 				switch (s->op) {
 					/* Two operand operators */
@@ -488,6 +501,7 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 			}
 
 			symbol_stack_push(stack, s1);
+			s1 = NULL;
 		}
 
 		s = s->next;
@@ -496,18 +510,28 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 	if (stack->top != stack->bottom) {
 		err_msg("corrupted stack at finish stage\n");
 		print_stack(stack);
-		exit(1);
+		goto err;
 	}
 
 	s = symbol_stack_pull(stack);
 	if (s->type != INTVAL) {
 		err_msg("RPN evaluation result is not intval\n");
-		exit(1);
+		goto err;
 	}
 	intval = s->val;
 	symbol_destroy(s);
 
 	symbol_stack_destroy(stack);
+
+	return intval;
+
+err_s:
+	symbol_destroy(s1);
+	symbol_destroy(s2);
+
+err:
+	symbol_stack_destroy(stack);
+	intval.type = INVAL;
 
 	return intval;
 }

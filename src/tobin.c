@@ -62,10 +62,16 @@ struct intval eval(char *exp)
 	struct symbol_queue *rpn;
 
 	rpn = expr_parse(exp);
+	if (!rpn)
+		goto err;
 	result = rpn_eval(rpn);
 
 	symbol_queue_destroy(rpn);
 
+	return result;
+
+err:
+	result.type = INVAL;
 	return result;
 }
 
@@ -171,6 +177,10 @@ int tobin_main(int argc, char *argv[])
 
 	for (i = 0; i < argc; i++) {
 		result = eval(argv[i]);
+		if (result.type == INVAL) {
+			ret = 1;
+			goto end;
+		}
 		print_intval(result);
 		if (i > 0)
 			printf("\n");
