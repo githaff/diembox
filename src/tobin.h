@@ -56,5 +56,13 @@ struct symbol_queue *expr_parse(char *str_orig);
 void print_queue(struct symbol_queue *out);
 struct intval rpn_eval(struct symbol_queue *rpn);
 
+struct symbol *symbol_create();
+struct symbol_queue *symbol_queue_create();
+struct symbol_stack *symbol_stack_create();
+
+void symbol_destroy(struct symbol *s);
+void symbol_queue_destroy(struct symbol_queue *queue);
+void symbol_stack_destroy(struct symbol_stack *stack);
+
 
 #endif /* __TOBIN_H */

@@ -73,6 +73,8 @@ struct symbol *symbol_stack_pull(struct symbol_stack *stack)
 
 void print_symbol(struct symbol *s)
 {
+	if (s == NULL)
+		dbg_msg("-null-");
 	if (s->type == INTVAL)
 		/* TODO: fix for other integer types */
 		dbg_msg("%d", s->val.s32);
@@ -138,9 +140,36 @@ void print_state(char *token, struct symbol_queue *out,
 	print_stack(stack);
 }
 
+struct symbol *symbol_create()
+{
+	return calloc(1, sizeof(struct symbol));
+}
+
+void symbol_destroy(struct symbol *s)
+{
+	free(s);
+}
+
 struct symbol_queue *symbol_queue_create()
 {
 	return calloc(1, sizeof(struct symbol_queue));
+}
+
+void symbol_queue_destroy(struct symbol_queue *queue)
+{
+	struct symbol *s;
+	struct symbol *s_next;
+
+	s = queue->first;
+	while (s && s != queue->last) {
+		s_next = s->next;
+		symbol_destroy(s);
+		s = s_next;
+	}
+	if (s)
+		symbol_destroy(s);
+
+	free(queue);
 }
 
 struct symbol_stack *symbol_stack_create()
@@ -148,12 +177,19 @@ struct symbol_stack *symbol_stack_create()
 	return calloc(1, sizeof(struct symbol_stack));
 }
 
-char *strdup(char *str)
+void symbol_stack_destroy(struct symbol_stack *stack)
 {
-	char *str_new;
-	str_new = (char *)calloc(strlen(str) + 1, sizeof(char));
-	strcpy(str_new, str);
-	return str_new;
+	struct symbol *s;
+	struct symbol *s_next;
+
+	s = stack->top;
+	while (s) {
+		s_next = s->next;
+		symbol_destroy(s);
+		s = s_next;
+	}
+
+	free(stack);
 }
 
 int char_in_ops(char symb)
@@ -276,7 +312,7 @@ struct symbol *symbol_extract(char **str_orig)
 	if (*str == 0)
 		return 0;
 
-	s = calloc(1, sizeof(struct symbol));
+	s = symbol_create();
 	s->type = NONE;
 
 	type = extract_intstr(&str, buf);
@@ -318,8 +354,6 @@ struct symbol_queue *expr_parse(char *str)
 
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
-
-	printf("STR=%s\n", str);
 
 	s = symbol_extract(&str);
 	while (s) {
@@ -371,7 +405,7 @@ struct symbol_queue *expr_parse(char *str)
 		s = symbol_stack_pull(stack);
 	}
 
-	free(stack);
+	symbol_stack_destroy(stack);
 
 	return out;
 }
@@ -380,7 +414,7 @@ struct symbol *symbol_clone(struct symbol *s)
 {
 	struct symbol *s_new;
 
-	s_new = malloc(sizeof(struct symbol));
+	s_new = symbol_create();
 	memcpy(s_new, s, sizeof(struct symbol));
 
 	return s_new;
@@ -450,13 +484,13 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 				case OR      : S_OP_BIN(s1, s2, |);  break;
 				default      : s->val.s32 = -1;      break;
 				}
+				symbol_destroy(s2);
 			}
 
 			symbol_stack_push(stack, s1);
 		}
 
 		s = s->next;
-		rpn->first = s;
 	}
 
 	if (stack->top != stack->bottom) {
@@ -471,8 +505,9 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 		exit(1);
 	}
 	intval = s->val;
+	symbol_destroy(s);
 
-	free(stack);
+	symbol_stack_destroy(stack);
 
 	return intval;
 }

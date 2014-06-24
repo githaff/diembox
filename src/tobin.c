@@ -64,6 +64,8 @@ struct intval eval(char *exp)
 	rpn = expr_parse(exp);
 	result = rpn_eval(rpn);
 
+	symbol_queue_destroy(rpn);
+
 	return result;
 }
 
