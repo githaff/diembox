@@ -108,7 +108,6 @@ void print_16(u16_t val)
 
 void print_32(u32_t val)
 {
-	printf("val=%d\n", val);
 	u8_t *bytes = (u8_t*)&val;
 
 	puts("31     24  23     16");
@@ -140,24 +139,35 @@ void print_64(u64_t val)
 void print_intval(struct intval val)
 {
 	switch (val.type) {
-	case S8 :
-	case U8 :
-		print_8(val.u8);
-		break;
-	case S16 :
-	case U16 :
-		print_16(val.u16);
-		break;
-	case S32 :
-	case U32 :
-		print_32(val.u32);
-		break;
-	case S64 :
-	case U64 :
-		print_64(val.u64);
-		break;
+	case S8  : printf("Dec: %d\n",  val.s8);  break;
+	case U8  : printf("Dec: %d\n",  val.u8);  break;
+	case S16 : printf("Dec: %d\n",  val.s16); break;
+	case U16 : printf("Dec: %d\n",  val.u16); break;
+	case S32 : printf("Dec: %d\n",  val.s32); break;
+	case U32 : printf("Dec: %d\n",  val.u32); break;
+	case S64 : printf("Dec: %ld\n", val.s64); break;
+	case U64 : printf("Dec: %ld\n", val.u64); break;
 	default:
 		err_msg("invalid intval\n");
+		return;
+	}
+
+	switch (val.type) {
+	case S8  : case U8  : printf("Hex: 0x%02x\n",   val.u8);  break;
+	case S16 : case U16 : printf("Hex: 0x%04x\n",   val.u16); break;
+	case S32 : case U32 : printf("Hex: 0x%08x\n",   val.u32); break;
+	case S64 : case U64 : printf("Hex: 0x%016lx\n", val.u64); break;
+	default: return;
+	}
+
+	printf("Bin:\n");
+
+	switch (val.type) {
+	case S8  : case U8  : print_8(val.u8);   break;
+	case S16 : case U16 : print_16(val.u16); break;
+	case S32 : case U32 : print_32(val.u32); break;
+	case S64 : case U64 : print_64(val.u64); break;
+	default: return;
 	}
 }
 
