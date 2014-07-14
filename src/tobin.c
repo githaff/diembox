@@ -9,16 +9,19 @@
 
 
 enum intval_type default_initval_type;
+enum output_type { OUTPUT_NORM = 0, OUTPUT_DIFF };
 
+int opts_diff;
 int opts_help;
 const char *opts_type = "s32";
 
 struct extopt tobin_opts[] = {
-/*
-  Options TODO:
-  -d, --diff          - show xor-difference between two first expression results
- */
 	{
+		EXTOPT_NO_ARG(&opts_diff),
+		.name_long = "diff",
+		.name_short = 'd',
+		.desc = "show difference between selected expressions",
+	}, {
 		.name_long = "type",
 		.name_short = 't',
 		EXTOPT_ARG_STR("TYPE", &opts_type),
@@ -172,9 +175,29 @@ void print_intval(struct intval val)
 }
 
 
+void print_result(struct intval *res, int size, enum output_type type)
+{
+	int i;
+
+	switch (type) {
+	case OUTPUT_NORM :
+		for (i = 0; i < size; i++) {
+			if (i)
+				printf("\n");
+
+			print_intval(res[i]);
+		}
+		break;
+	case OUTPUT_DIFF :
+		printf("DIFF\n");
+		break;
+	}
+}
+
+
 int tobin_main(int argc, char *argv[])
 {
-	struct intval result;
+	struct intval *result = NULL;
 	int ret = 0;
 	int i;
 
@@ -185,18 +208,24 @@ int tobin_main(int argc, char *argv[])
 	}
 	default_initval_type = parse_intval_type(opts_type);
 
+	result = calloc(argc, sizeof(struct intval));
 	for (i = 0; i < argc; i++) {
-		result = eval(argv[i]);
-		if (result.type == INVAL) {
+		result[i] = eval(argv[i]);
+		if (result[i].type == INVAL) {
 			ret = 1;
 			goto end;
 		}
-		print_intval(result);
-		if (i > 0)
-			printf("\n");
 	}
 
+	if (opts_diff)
+		print_result(result, argc, OUTPUT_DIFF);
+	else
+		print_result(result, argc, OUTPUT_NORM);
+
 end:
+	if (result)
+		free(result);
+
 	return ret;
 }
 
