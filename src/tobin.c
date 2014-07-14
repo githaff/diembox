@@ -9,9 +9,10 @@
 
 
 enum intval_type default_initval_type;
-enum output_type { OUTPUT_NORM = 0, OUTPUT_DIFF };
+enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
 int opts_diff;
+int opts_common;
 int opts_help;
 const char *opts_type = "s32";
 
@@ -20,7 +21,12 @@ struct extopt tobin_opts[] = {
 		EXTOPT_NO_ARG(&opts_diff),
 		.name_long = "diff",
 		.name_short = 'd',
-		.desc = "show difference between selected expressions",
+		.desc = "highlight difference between selected expressions",
+	}, {
+		EXTOPT_NO_ARG(&opts_common),
+		.name_long = "common",
+		.name_short = 'c',
+		.desc = "highlight common part between selected expressions",
 	}, {
 		.name_long = "type",
 		.name_short = 't',
@@ -78,68 +84,84 @@ err:
 	return result;
 }
 
-char *byte_str(u8_t byte)
+char *byte_str(u8_t byte, u8_t byte_hl)
 {
-	static char str[] = "0000 0000";
+	static char str[255];
+	int sh;
+	int i;
+	int pos = 0;
 
-	str[0] = (byte >> 7) & 0x1 ? '1' : '0';
-	str[1] = (byte >> 6) & 0x1 ? '1' : '0';
-	str[2] = (byte >> 5) & 0x1 ? '1' : '0';
-	str[3] = (byte >> 4) & 0x1 ? '1' : '0';
-	str[5] = (byte >> 3) & 0x1 ? '1' : '0';
-	str[6] = (byte >> 2) & 0x1 ? '1' : '0';
-	str[7] = (byte >> 1) & 0x1 ? '1' : '0';
-	str[8] = byte & 0x1 ? '1' : '0';
+	for (i = 0, sh = 7; i < 9; i++, sh--) {
+		if (i == 4) {
+			str[pos++] = ' ';
+			sh++;
+			continue;
+		}
+
+		if (BIT(byte_hl, sh)) {
+			pos += sprintf(str + pos, COLOR_TEXT("%d"), BIT(byte, sh));
+		} else
+			str[pos++] = BIT(byte, sh) ? '1' : '0';
+	}
+
+	str[pos] = 0;
 
 	return str;
 }
 
-void print_8(u8_t val)
+void print_8(u8_t val, u8_t hl)
 {
 	puts("7       0");
-	printf("%s\n", byte_str(val));
+	printf("%s\n", byte_str(val, hl));
 }
 
-void print_16(u16_t val)
+void print_16(u16_t val, u16_t hl)
 {
 	u8_t *bytes = (u8_t*)&val;
+	u8_t *bytes_hl = (u8_t*)&hl;
 
 	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1]));
-	printf("%s\n", byte_str(bytes[0]));
+	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
+	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
 }
 
-void print_32(u32_t val)
+void print_32(u32_t val, u32_t hl)
 {
 	u8_t *bytes = (u8_t*)&val;
+	u8_t *bytes_hl = (u8_t*)&hl;
 
 	puts("31     24  23     16");
-	printf("%s  ", byte_str(bytes[3]));
-	printf("%s\n", byte_str(bytes[2]));
+	printf("%s  ", byte_str(bytes[3], bytes_hl[3]));
+	printf("%s\n", byte_str(bytes[2], bytes_hl[2]));
 	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1]));
-	printf("%s\n", byte_str(bytes[0]));
+	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
+	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
 }
 
-void print_64(u64_t val)
+void print_64(u64_t val, u64_t hl)
 {
 	u8_t *bytes = (u8_t*)&val;
+	u8_t *bytes_hl = (u8_t*)&hl;
 
 	puts("63     56  55     48");
-	printf("%s  ", byte_str(bytes[7]));
-	printf("%s\n", byte_str(bytes[6]));
+	printf("%s  ", byte_str(bytes[7], bytes_hl[7]));
+	printf("%s\n", byte_str(bytes[6], bytes_hl[6]));
 	puts("47     40  39     32");
-	printf("%s  ", byte_str(bytes[5]));
-	printf("%s\n", byte_str(bytes[4]));
+	printf("%s  ", byte_str(bytes[5], bytes_hl[5]));
+	printf("%s\n", byte_str(bytes[4], bytes_hl[4]));
 	puts("31     24  23     16");
-	printf("%s  ", byte_str(bytes[3]));
-	printf("%s\n", byte_str(bytes[2]));
+	printf("%s  ", byte_str(bytes[3], bytes_hl[3]));
+	printf("%s\n", byte_str(bytes[2], bytes_hl[2]));
 	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1]));
-	printf("%s\n", byte_str(bytes[0]));
+	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
+	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
 }
 
-void print_intval(struct intval val)
+/*
+ * Print intval regarding its type.
+ * hl - mask for bits needed to be highlighted
+ */
+void print_intval(struct intval val, struct intval hl)
 {
 	switch (val.type) {
 	case S8  : printf("Dec: %d\n",  val.s8);  break;
@@ -166,10 +188,10 @@ void print_intval(struct intval val)
 	printf("Bin:\n");
 
 	switch (val.type) {
-	case S8  : case U8  : print_8(val.u8);   break;
-	case S16 : case U16 : print_16(val.u16); break;
-	case S32 : case U32 : print_32(val.u32); break;
-	case S64 : case U64 : print_64(val.u64); break;
+	case S8  : case U8  : print_8(val.u8,   hl.u8);   break;
+	case S16 : case U16 : print_16(val.u16, hl.u16); break;
+	case S32 : case U32 : print_32(val.u32, hl.u32); break;
+	case S64 : case U64 : print_64(val.u64, hl.u64); break;
 	default: return;
 	}
 }
@@ -177,20 +199,33 @@ void print_intval(struct intval val)
 
 void print_result(struct intval *res, int size, enum output_type type)
 {
-	int i;
+	struct intval hl;
+	int i, j;
 
+	hl.u64 = 0;
 	switch (type) {
-	case OUTPUT_NORM :
-		for (i = 0; i < size; i++) {
-			if (i)
-				printf("\n");
-
-			print_intval(res[i]);
-		}
+	case OUTPUT_COMMON :
+		for (i = 0; i < size; i++)
+			for (j = 0; j < i; j++)
+				hl.u64 |= res[i].u64 ^ res[j].u64;
+		hl.u64 = ~hl.u64;
 		break;
 	case OUTPUT_DIFF :
-		printf("DIFF\n");
+		for (i = 0; i < size; i++)
+			for (j = 0; j < i; j++)
+				hl.u64 |= res[i].u64 ^ res[j].u64;
 		break;
+	case OUTPUT_NORM :
+	default :
+		break;
+	}
+
+
+	for (i = 0; i < size; i++) {
+		if (i)
+			printf("\n");
+
+		print_intval(res[i], hl);
 	}
 }
 
@@ -198,6 +233,7 @@ void print_result(struct intval *res, int size, enum output_type type)
 int tobin_main(int argc, char *argv[])
 {
 	struct intval *result = NULL;
+	enum output_type print_type;
 	int ret = 0;
 	int i;
 
@@ -217,10 +253,13 @@ int tobin_main(int argc, char *argv[])
 		}
 	}
 
+	print_type = OUTPUT_NORM;
+	if (opts_common)
+		print_type = OUTPUT_COMMON;
 	if (opts_diff)
-		print_result(result, argc, OUTPUT_DIFF);
-	else
-		print_result(result, argc, OUTPUT_NORM);
+		print_type = OUTPUT_DIFF;
+
+	print_result(result, argc, print_type);
 
 end:
 	if (result)
