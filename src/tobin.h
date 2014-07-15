@@ -52,8 +52,8 @@ struct intval {
 	};
 };
 
+#define DEFAULT_INTVAL_TYPE S32;
 extern enum intval_type intval_type;
-extern enum intval_type default_intval_type;
 
 enum operator { PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R, NEG,
 				AND, XOR, OR, PAR_L, PAR_R };

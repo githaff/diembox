@@ -8,14 +8,13 @@
 #include "tobin.h"
 
 
-enum intval_type default_intval_type = S32;
 enum intval_type intval_type;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
 int opts_diff;
 int opts_common;
 int opts_help;
-char opts_type[255];
+int opts_type;
 
 struct extopt tobin_opts[] = {
 	{
@@ -29,10 +28,10 @@ struct extopt tobin_opts[] = {
 		.name_short = 'c',
 		.desc = "highlight common part between selected expressions",
 	}, {
-		.name_long = "type",
-		.name_short = 't',
-		EXTOPT_ARG_STR_ALLOC("TYPE", &opts_type),
-		.desc = "internal data type (s32 is default)",
+		.name_short = 'b',
+		EXTOPT_ARG_INT("SIZE", &opts_type),
+		.desc = "size of internal data type in bits. "
+		"8, 16, 32, 64 are supported. 32 is default.",
 	},
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_END
@@ -45,21 +44,18 @@ void tobin_help(void)
 	extmod_print_opts(extmod);
 }
 
-enum intval_type parse_intval_type(const char *str)
+enum intval_type get_intval_type(int size)
 {
-	if (!strlen(str))
-		return default_intval_type;
-
-	if (!strcmp(str, "s8"))
-		return S8;
-	else if (!strcmp(str, "s16"))
-		return S16;
-	else if (!strcmp(str, "s32"))
-		return S32;
-	else if (!strcmp(str, "s64"))
-		return S64;
-
-	err_msg("unknown intval type %s. Look --help for more info\n", str);
+	switch (size) {
+	case 0  : return DEFAULT_INTVAL_TYPE;
+	case 8  : return S8;
+	case 16 : return S16;
+	case 32 : return S32;
+	case 64 : return S64;
+	default :
+		err_msg("unknown intval type %d. Look --help for more info\n", size);
+		break;
+	}
 
 	return INVAL;
 }
@@ -244,7 +240,7 @@ int tobin_main(int argc, char *argv[])
 
 	result = calloc(argc, sizeof(struct intval));
 	for (i = 0; i < argc; i++) {
-		intval_type = parse_intval_type(opts_type);
+		intval_type = get_intval_type(opts_type);
 		if (intval_type == INVAL) {
 			ret = 1;
 			goto end;
@@ -282,11 +278,7 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"[[OPTIONS]]\n"
 			"It works only with integer data types.\n"
 			"Supported operators: +, -, /, %, <<, >>, (, )\n"
-			"Supported types:\n"
-			"  s8  - unsigned 8-bit\n"
-			"  s16 - unsigned 16-bit\n"
-			"  s32 - unsigned 32-bit\n"
-			"  s64 - unsigned 64-bit\n"
+			"Supported types: 8, 16, 32, 64 bit.\n"
 			"Data type for each used value can be specified in () right before the value\n"
 			"itself.\n"
 			"\n"
