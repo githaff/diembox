@@ -216,6 +216,7 @@ void print_result(struct intval *res, int size, enum output_type type)
 		break;
 	case OUTPUT_NORM :
 	default :
+		hl.u64 = 0;
 		break;
 	}
 
