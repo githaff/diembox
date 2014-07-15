@@ -3,11 +3,18 @@
 
 #include "common.h"
 
-
+#define INTVAL_SET(V, VAL)						\
+	switch (V.type) {							\
+	case U8  : V.u8  = VAL; break;				\
+	case U16 : V.u16 = VAL; break;				\
+	case U32 : V.u32 = VAL; break;				\
+	case U64 : V.u64 = VAL; break;				\
+	default : break;							\
+	}
 #define INTVAL_OP_BIN(V_OUT, V1, V2, OP)					\
 	{														\
-		V_OUT.type = default_intval_type;					\
-		switch (default_intval_type) {						\
+		V_OUT.type = intval_type;							\
+		switch (intval_type) {								\
 		case U8  : V_OUT.u8  = (V1.u8  OP V2.u8);  break; 	\
 		case U16 : V_OUT.u16 = (V1.u16 OP V2.u16); break;	\
 		case U32 : V_OUT.u32 = (V1.u32 OP V2.u32); break;	\
@@ -20,8 +27,8 @@
 	}
 #define INTVAL_OP_UNO(V_OUT, V1, OP)				\
 	{												\
-		V_OUT.type = default_intval_type;			\
-		switch (default_intval_type) {				\
+		V_OUT.type = intval_type;					\
+		switch (intval_type) {						\
 		case U8  : V_OUT.u8  = (OP V1.u8);  break;	\
 		case U16 : V_OUT.u16 = (OP V1.u16); break;	\
 		case U32 : V_OUT.u32 = (OP V1.u32); break;	\
@@ -45,6 +52,7 @@ struct intval {
 	};
 };
 
+extern enum intval_type intval_type;
 extern enum intval_type default_intval_type;
 
 enum operator { PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R, NEG,

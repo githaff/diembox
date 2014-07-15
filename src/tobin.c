@@ -9,6 +9,7 @@
 
 
 enum intval_type default_intval_type = U32;
+enum intval_type intval_type;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
 int opts_diff;
@@ -239,14 +240,15 @@ int tobin_main(int argc, char *argv[])
 		tobin_help();
 		goto end;
 	}
-	default_intval_type = parse_intval_type(opts_type);
-	if (default_intval_type == INVAL) {
-		ret = 1;
-		goto end;
-	}
 
 	result = calloc(argc, sizeof(struct intval));
 	for (i = 0; i < argc; i++) {
+		intval_type = parse_intval_type(opts_type);
+		if (intval_type == INVAL) {
+			ret = 1;
+			goto end;
+		}
+
 		result[i] = eval(argv[i]);
 		if (result[i].type == INVAL) {
 			ret = 1;

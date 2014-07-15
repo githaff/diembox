@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "tobin.h"
 
@@ -251,7 +252,7 @@ int strcmp_part(char **whole_orig, char *part)
 enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
-	enum intval_type type = default_intval_type;
+	enum intval_type type = intval_type;
 	int len = 0;
 
 	if (*str == '-') {
@@ -291,21 +292,29 @@ int read_val(char *valstr, struct symbol *s)
 {
 	int ret = 1;
 	char *endptr;
+	u64_t tmp;
+	enum intval_type type = s->val.type;
 
 	if (s->type != INTVAL)
 		return 0;
 
-	switch (s->val.type) {
-	case U8  : s->val.u8  = strtoll(valstr, &endptr, 0); break;
-	case U16 : s->val.u16 = strtoll(valstr, &endptr, 0); break;
-	case U32 : s->val.u32 = strtoll(valstr, &endptr, 0); break;
-	case U64 : s->val.u64 = strtoll(valstr, &endptr, 0); break;
-	default : break;
+	tmp = strtoull(valstr, &endptr, 0);
+	if (*endptr) {
+		ret = 0;
+		goto end;
 	}
 
-	if (*endptr)
-		ret = 0;
+	if (type == U8 && tmp > UCHAR_MAX)
+		type = U16;
+	if (type == U16 && tmp > USHRT_MAX)
+		type = U32;
+	if (type == U32 && tmp > UINT_MAX)
+		type = U64;
+	s->val.type = type;
 
+	INTVAL_SET(s->val, tmp);
+
+end:
 	return ret;
 }
 
@@ -363,6 +372,7 @@ struct symbol_queue *expr_parse(char *str)
 	struct symbol_stack *stack;
 	struct symbol *s;
 	struct symbol *top;
+	enum intval_type max_type = intval_type;
 
 	out   = symbol_queue_create();
 	stack = symbol_stack_create();
@@ -372,7 +382,8 @@ struct symbol_queue *expr_parse(char *str)
 		if (s->type == NONE) {
 			err_msg("incorrect symbol at '%s'\n", str);
 			goto err;
-		}
+		} else if (s->type == INTVAL && s->val.type > max_type)
+			max_type = s->val.type;
 
 		if (s->type == INTVAL)
 			symbol_queue_add(out, s);
@@ -413,6 +424,16 @@ struct symbol_queue *expr_parse(char *str)
 	while (s) {
 		symbol_queue_add(out, s);
 		s = symbol_stack_pull(stack);
+	}
+
+	if (max_type > intval_type) {
+		intval_type = max_type;
+		s = out->first;
+		while (s) {
+			if (s->type == INTVAL)
+				s->val.type = max_type;
+			s = s->next;
+		}
 	}
 
 	symbol_stack_destroy(stack);
