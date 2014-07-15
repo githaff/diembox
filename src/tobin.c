@@ -15,6 +15,7 @@ int opts_diff;
 int opts_common;
 int opts_help;
 int opts_type;
+int opts_list;
 
 struct extopt tobin_opts[] = {
 	{
@@ -27,6 +28,11 @@ struct extopt tobin_opts[] = {
 		.name_long = "common",
 		.name_short = 'c',
 		.desc = "highlight common part between selected expressions",
+	}, {
+		EXTOPT_NO_ARG(&opts_list),
+		.name_long = "list",
+		.name_short = 'l',
+		.desc = "print results in for of a list (vertically one after another)",
 	}, {
 		.name_short = 'b',
 		EXTOPT_ARG_INT("SIZE", &opts_type),
@@ -216,11 +222,15 @@ void print_result(struct intval *res, int size, enum output_type type)
 		break;
 	}
 
-	for (i = 0; i < size; i++) {
-		if (i)
-			printf("\n");
+	if (opts_list) {
+		for (i = 0; i < size; i++) {
+			if (i)
+				printf("\n");
 
-		print_intval(res[i], hl);
+			print_intval(res[i], hl);
+		}
+	} else {
+		/* TODO: To Be Implemented */
 	}
 }
 
