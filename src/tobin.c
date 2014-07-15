@@ -8,7 +8,7 @@
 #include "tobin.h"
 
 
-enum intval_type default_intval_type = U32;
+enum intval_type default_intval_type = S32;
 enum intval_type intval_type;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
@@ -32,7 +32,7 @@ struct extopt tobin_opts[] = {
 		.name_long = "type",
 		.name_short = 't',
 		EXTOPT_ARG_STR_ALLOC("TYPE", &opts_type),
-		.desc = "internal data type (u32 is default)",
+		.desc = "internal data type (s32 is default)",
 	},
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_END
@@ -50,14 +50,14 @@ enum intval_type parse_intval_type(const char *str)
 	if (!strlen(str))
 		return default_intval_type;
 
-	if (!strcmp(str, "u8"))
-		return U8;
-	else if (!strcmp(str, "u16"))
-		return U16;
-	else if (!strcmp(str, "u32"))
-		return U32;
-	else if (!strcmp(str, "u64"))
-		return U64;
+	if (!strcmp(str, "s8"))
+		return S8;
+	else if (!strcmp(str, "s16"))
+		return S16;
+	else if (!strcmp(str, "s32"))
+		return S32;
+	else if (!strcmp(str, "s64"))
+		return S64;
 
 	err_msg("unknown intval type %s. Look --help for more info\n", str);
 
@@ -83,7 +83,7 @@ err:
 	return result;
 }
 
-char *byte_str(u8_t byte, u8_t byte_hl)
+char *byte_str(s8_t byte, s8_t byte_hl)
 {
 	static char str[255];
 	int sh;
@@ -108,26 +108,26 @@ char *byte_str(u8_t byte, u8_t byte_hl)
 	return str;
 }
 
-void print_8(u8_t val, u8_t hl)
+void print_8(s8_t val, s8_t hl)
 {
 	puts("7       0");
 	printf("%s\n", byte_str(val, hl));
 }
 
-void print_16(u16_t val, u16_t hl)
+void print_16(s16_t val, s16_t hl)
 {
-	u8_t *bytes = (u8_t*)&val;
-	u8_t *bytes_hl = (u8_t*)&hl;
+	s8_t *bytes = (s8_t*)&val;
+	s8_t *bytes_hl = (s8_t*)&hl;
 
 	puts("15      8  7       0");
 	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
 	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
 }
 
-void print_32(u32_t val, u32_t hl)
+void print_32(s32_t val, s32_t hl)
 {
-	u8_t *bytes = (u8_t*)&val;
-	u8_t *bytes_hl = (u8_t*)&hl;
+	s8_t *bytes = (s8_t*)&val;
+	s8_t *bytes_hl = (s8_t*)&hl;
 
 	puts("31     24  23     16");
 	printf("%s  ", byte_str(bytes[3], bytes_hl[3]));
@@ -137,10 +137,10 @@ void print_32(u32_t val, u32_t hl)
 	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
 }
 
-void print_64(u64_t val, u64_t hl)
+void print_64(s64_t val, s64_t hl)
 {
-	u8_t *bytes = (u8_t*)&val;
-	u8_t *bytes_hl = (u8_t*)&hl;
+	s8_t *bytes = (s8_t*)&val;
+	s8_t *bytes_hl = (s8_t*)&hl;
 
 	puts("63     56  55     48");
 	printf("%s  ", byte_str(bytes[7], bytes_hl[7]));
@@ -163,30 +163,30 @@ void print_64(u64_t val, u64_t hl)
 void print_intval(struct intval val, struct intval hl)
 {
 	switch (val.type) {
-	case U8  : printf("Dec: %d\n",  val.u8);  break;
-	case U16 : printf("Dec: %d\n",  val.u16); break;
-	case U32 : printf("Dec: %d\n",  val.u32); break;
-	case U64 : printf("Dec: %ld\n", val.u64); break;
+	case S8  : printf("Dec: %d\n",  val.s8);  break;
+	case S16 : printf("Dec: %d\n",  val.s16); break;
+	case S32 : printf("Dec: %d\n",  val.s32); break;
+	case S64 : printf("Dec: %ld\n", val.s64); break;
 	default:
 		err_msg("invalid intval\n");
 		return;
 	}
 
 	switch (val.type) {
-	case U8  : printf("Hex: 0x%02x\n",   val.u8);  break;
-	case U16 : printf("Hex: 0x%04x\n",   val.u16); break;
-	case U32 : printf("Hex: 0x%08x\n",   val.u32); break;
-	case U64 : printf("Hex: 0x%016lx\n", val.u64); break;
+	case S8  : printf("Hex: 0x%02x\n",   val.s8);  break;
+	case S16 : printf("Hex: 0x%04x\n",   val.s16); break;
+	case S32 : printf("Hex: 0x%08x\n",   val.s32); break;
+	case S64 : printf("Hex: 0x%016lx\n", val.s64); break;
 	default: return;
 	}
 
 	printf("Bin:\n");
 
 	switch (val.type) {
-	case U8  : print_8(val.u8,   hl.u8);   break;
-	case U16 : print_16(val.u16, hl.u16); break;
-	case U32 : print_32(val.u32, hl.u32); break;
-	case U64 : print_64(val.u64, hl.u64); break;
+	case S8  : print_8(val.s8,   hl.s8);   break;
+	case S16 : print_16(val.s16, hl.s16); break;
+	case S32 : print_32(val.s32, hl.s32); break;
+	case S64 : print_64(val.s64, hl.s64); break;
 	default: return;
 	}
 }
@@ -199,24 +199,24 @@ void print_result(struct intval *res, int size, enum output_type type)
 	struct intval hl;
 	int i, j;
 
-	diff.u64 = 0;
+	diff.s64 = 0;
 	for (i = 0; i < size; i++) {
 		for (j = 0; j < i; j++) {
 			INTVAL_OP_BIN(tmp, res[i], res[j], ^);
-			diff.u64 |= tmp.u64;
+			diff.s64 |= tmp.s64;
 		}
 	}
 
 	switch (type) {
 	case OUTPUT_COMMON :
-		hl.u64 = ~diff.u64;
+		hl.s64 = ~diff.s64;
 		break;
 	case OUTPUT_DIFF :
-		hl.u64 = diff.u64;
+		hl.s64 = diff.s64;
 		break;
 	case OUTPUT_NORM :
 	default :
-		hl.u64 = 0;
+		hl.s64 = 0;
 		break;
 	}
 
@@ -283,10 +283,10 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"It works only with integer data types.\n"
 			"Supported operators: +, -, /, %, <<, >>, (, )\n"
 			"Supported types:\n"
-			"  u8  - unsigned 8-bit\n"
-			"  u16 - unsigned 16-bit\n"
-			"  u32 - unsigned 32-bit\n"
-			"  u64 - unsigned 64-bit\n"
+			"  s8  - unsigned 8-bit\n"
+			"  s16 - unsigned 16-bit\n"
+			"  s32 - unsigned 32-bit\n"
+			"  s64 - unsigned 64-bit\n"
 			"Data type for each used value can be specified in () right before the value\n"
 			"itself.\n"
 			"\n"

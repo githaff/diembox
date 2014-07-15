@@ -5,22 +5,22 @@
 
 #define INTVAL_SET(V, VAL)						\
 	switch (V.type) {							\
-	case U8  : V.u8  = VAL; break;				\
-	case U16 : V.u16 = VAL; break;				\
-	case U32 : V.u32 = VAL; break;				\
-	case U64 : V.u64 = VAL; break;				\
+	case S8  : V.s8  = VAL; break;				\
+	case S16 : V.s16 = VAL; break;				\
+	case S32 : V.s32 = VAL; break;				\
+	case S64 : V.s64 = VAL; break;				\
 	default : break;							\
 	}
 #define INTVAL_OP_BIN(V_OUT, V1, V2, OP)					\
 	{														\
 		V_OUT.type = intval_type;							\
 		switch (intval_type) {								\
-		case U8  : V_OUT.u8  = (V1.u8  OP V2.u8);  break; 	\
-		case U16 : V_OUT.u16 = (V1.u16 OP V2.u16); break;	\
-		case U32 : V_OUT.u32 = (V1.u32 OP V2.u32); break;	\
-		case U64 : V_OUT.u64 = (V1.u64 OP V2.u64); break;	\
+		case S8  : V_OUT.s8  = (V1.s8  OP V2.s8);  break; 	\
+		case S16 : V_OUT.s16 = (V1.s16 OP V2.s16); break;	\
+		case S32 : V_OUT.s32 = (V1.s32 OP V2.s32); break;	\
+		case S64 : V_OUT.s64 = (V1.s64 OP V2.s64); break;	\
 		default  :											\
-			V_OUT.u64 = 0;									\
+			V_OUT.s64 = 0;									\
 			dbg_msg("invalid default intval type"); 		\
 			break;											\
 		}													\
@@ -29,12 +29,12 @@
 	{												\
 		V_OUT.type = intval_type;					\
 		switch (intval_type) {						\
-		case U8  : V_OUT.u8  = (OP V1.u8);  break;	\
-		case U16 : V_OUT.u16 = (OP V1.u16); break;	\
-		case U32 : V_OUT.u32 = (OP V1.u32); break;	\
-		case U64 : V_OUT.u64 = (OP V1.u64); break;	\
+		case S8  : V_OUT.s8  = (OP V1.s8);  break;	\
+		case S16 : V_OUT.s16 = (OP V1.s16); break;	\
+		case S32 : V_OUT.s32 = (OP V1.s32); break;	\
+		case S64 : V_OUT.s64 = (OP V1.s64); break;	\
 		default  :									\
-			V_OUT.u64 = 0;							\
+			V_OUT.s64 = 0;							\
 			dbg_msg("invalid default intval type");	\
 			break;									\
 		}											\
@@ -43,12 +43,12 @@
 #define S_OP_UNO(S_OUT, S1, OP) INTVAL_OP_UNO(S_OUT->val, S1->val, OP)
 
 struct intval {
-	enum intval_type { INVAL = 0, U8, U16, U32, U64 } type;
+	enum intval_type { INVAL = 0, S8, S16, S32, S64 } type;
 	union {
-		u8_t  u8;
-		u16_t u16;
-		u32_t u32;
-		u64_t u64;
+		s8_t  s8;
+		s16_t s16;
+		s32_t s32;
+		s64_t s64;
 	};
 };
 

@@ -78,10 +78,10 @@ void print_symbol(struct symbol *s)
 		dbg_msg("-null-");
 	if (s->type == INTVAL) {
 		switch (s->val.type) {
-		case U8  : dbg_msg("%d", s->val.u8);   break;
-		case U16 : dbg_msg("%d", s->val.u16);  break;
-		case U32 : dbg_msg("%d", s->val.u32);  break;
-		case U64 : dbg_msg("%ld", s->val.u64); break;
+		case S8  : dbg_msg("%d", s->val.s8);   break;
+		case S16 : dbg_msg("%d", s->val.s16);  break;
+		case S32 : dbg_msg("%d", s->val.s32);  break;
+		case S64 : dbg_msg("%ld", s->val.s64); break;
 		default  : dbg_msg("-invalid-value-"); break;
 		}
 	}
@@ -292,14 +292,14 @@ int read_val(char *valstr, struct symbol *s)
 {
 	int ret = 1;
 	char *endptr;
-	u64_t tmp;
+	s64_t tmp;
 	int len = 0;
 	enum intval_type type = s->val.type;
 
 	if (s->type != INTVAL)
 		return 0;
 
-	tmp = strtoull(valstr, &endptr, 0);
+	tmp = strtoll(valstr, &endptr, 0);
 	if (*endptr) {
 		ret = 0;
 		goto end;
@@ -308,12 +308,12 @@ int read_val(char *valstr, struct symbol *s)
 	if (strstr(valstr, "0x") == valstr)
 		len = strlen(valstr);
 
-	if (type == U8 && (tmp > UCHAR_MAX || len > 4))
-		type = U16;
-	if (type == U16 && (tmp > USHRT_MAX || len > 6))
-		type = U32;
-	if (type == U32 && (tmp > UINT_MAX || len > 10))
-		type = U64;
+	if (type == S8 && (tmp > CHAR_MAX || len > 4))
+		type = S16;
+	if (type == S16 && (tmp > SHRT_MAX || len > 6))
+		type = S32;
+	if (type == S32 && (tmp > INT_MAX || len > 10))
+		type = S64;
 	s->val.type = type;
 
 	INTVAL_SET(s->val, tmp);
