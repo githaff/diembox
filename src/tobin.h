@@ -4,6 +4,37 @@
 #include "common.h"
 
 
+#define INTVAL_OP_BIN(V_OUT, V1, V2, OP)					\
+	{														\
+		V_OUT.type = default_intval_type;					\
+		switch (default_intval_type) {						\
+		case U8  : V_OUT.u8  = (V1.u8  OP V2.u8);  break; 	\
+		case U16 : V_OUT.u16 = (V1.u16 OP V2.u16); break;	\
+		case U32 : V_OUT.u32 = (V1.u32 OP V2.u32); break;	\
+		case U64 : V_OUT.u64 = (V1.u64 OP V2.u64); break;	\
+		default  :											\
+			V_OUT.u64 = 0;									\
+			dbg_msg("invalid default intval type"); 		\
+			break;											\
+		}													\
+	}
+#define INTVAL_OP_UNO(V_OUT, V1, OP)				\
+	{												\
+		V_OUT.type = default_intval_type;			\
+		switch (default_intval_type) {				\
+		case U8  : V_OUT.u8  = (OP V1.u8);  break;	\
+		case U16 : V_OUT.u16 = (OP V1.u16); break;	\
+		case U32 : V_OUT.u32 = (OP V1.u32); break;	\
+		case U64 : V_OUT.u64 = (OP V1.u64); break;	\
+		default  :									\
+			V_OUT.u64 = 0;							\
+			dbg_msg("invalid default intval type");	\
+			break;									\
+		}											\
+	}
+#define S_OP_BIN(S_OUT, S1, S2, OP) INTVAL_OP_BIN(S_OUT->val, S1->val, S2->val, OP)
+#define S_OP_UNO(S_OUT, S1, OP) INTVAL_OP_UNO(S_OUT->val, S1->val, OP)
+
 struct intval {
 	enum intval_type { INVAL = 0, U8, U16, U32, U64 } type;
 	union {

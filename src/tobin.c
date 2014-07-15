@@ -193,27 +193,30 @@ void print_intval(struct intval val, struct intval hl)
 
 void print_result(struct intval *res, int size, enum output_type type)
 {
+	struct intval tmp;
+	struct intval diff;
 	struct intval hl;
 	int i, j;
 
-	hl.u64 = 0;
+	diff.u64 = 0;
+	for (i = 0; i < size; i++) {
+		for (j = 0; j < i; j++) {
+			INTVAL_OP_BIN(tmp, res[i], res[j], ^);
+			diff.u64 |= tmp.u64;
+		}
+	}
+
 	switch (type) {
 	case OUTPUT_COMMON :
-		for (i = 0; i < size; i++)
-			for (j = 0; j < i; j++)
-				hl.u64 |= res[i].u64 ^ res[j].u64;
-		hl.u64 = ~hl.u64;
+		hl.u64 = ~diff.u64;
 		break;
 	case OUTPUT_DIFF :
-		for (i = 0; i < size; i++)
-			for (j = 0; j < i; j++)
-				hl.u64 |= res[i].u64 ^ res[j].u64;
+		hl.u64 = diff.u64;
 		break;
 	case OUTPUT_NORM :
 	default :
 		break;
 	}
-
 
 	for (i = 0; i < size; i++) {
 		if (i)
