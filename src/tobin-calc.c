@@ -307,7 +307,6 @@ int read_val(char *valstr, struct symbol *s)
 
 	if (strstr(valstr, "0x") == valstr) {
 		len = strlen(valstr);
-
 		if (type == S8 && (tmp > UCHAR_MAX || len > 4))
 			type = S16;
 		if (type == S16 && (tmp > USHRT_MAX || len > 6))
