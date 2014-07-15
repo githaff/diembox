@@ -8,13 +8,13 @@
 #include "tobin.h"
 
 
-enum intval_type default_initval_type;
+enum intval_type default_intval_type = U32;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
 int opts_diff;
 int opts_common;
 int opts_help;
-const char *opts_type = "s32";
+char opts_type[255];
 
 struct extopt tobin_opts[] = {
 	{
@@ -30,8 +30,8 @@ struct extopt tobin_opts[] = {
 	}, {
 		.name_long = "type",
 		.name_short = 't',
-		EXTOPT_ARG_STR("TYPE", &opts_type),
-		.desc = "internal data type (s32 is default)",
+		EXTOPT_ARG_STR_ALLOC("TYPE", &opts_type),
+		.desc = "internal data type (u32 is default)",
 	},
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_END
@@ -46,22 +46,20 @@ void tobin_help(void)
 
 enum intval_type parse_intval_type(const char *str)
 {
-	if (!strcmp(str, "s8"))
-		return S8;
-	else if (!strcmp(str, "u8"))
+	if (!strlen(str))
+		return default_intval_type;
+
+	if (!strcmp(str, "u8"))
 		return U8;
-	else if (!strcmp(str, "s16"))
-		return S16;
 	else if (!strcmp(str, "u16"))
 		return U16;
-	else if (!strcmp(str, "s32"))
-		return S32;
 	else if (!strcmp(str, "u32"))
 		return U32;
-	else if (!strcmp(str, "s64"))
-		return S64;
 	else if (!strcmp(str, "u64"))
 		return U64;
+
+	err_msg("unknown intval type %s. Look --help for more info\n", str);
+
 	return INVAL;
 }
 
@@ -164,13 +162,9 @@ void print_64(u64_t val, u64_t hl)
 void print_intval(struct intval val, struct intval hl)
 {
 	switch (val.type) {
-	case S8  : printf("Dec: %d\n",  val.s8);  break;
 	case U8  : printf("Dec: %d\n",  val.u8);  break;
-	case S16 : printf("Dec: %d\n",  val.s16); break;
 	case U16 : printf("Dec: %d\n",  val.u16); break;
-	case S32 : printf("Dec: %d\n",  val.s32); break;
 	case U32 : printf("Dec: %d\n",  val.u32); break;
-	case S64 : printf("Dec: %ld\n", val.s64); break;
 	case U64 : printf("Dec: %ld\n", val.u64); break;
 	default:
 		err_msg("invalid intval\n");
@@ -178,20 +172,20 @@ void print_intval(struct intval val, struct intval hl)
 	}
 
 	switch (val.type) {
-	case S8  : case U8  : printf("Hex: 0x%02x\n",   val.u8);  break;
-	case S16 : case U16 : printf("Hex: 0x%04x\n",   val.u16); break;
-	case S32 : case U32 : printf("Hex: 0x%08x\n",   val.u32); break;
-	case S64 : case U64 : printf("Hex: 0x%016lx\n", val.u64); break;
+	case U8  : printf("Hex: 0x%02x\n",   val.u8);  break;
+	case U16 : printf("Hex: 0x%04x\n",   val.u16); break;
+	case U32 : printf("Hex: 0x%08x\n",   val.u32); break;
+	case U64 : printf("Hex: 0x%016lx\n", val.u64); break;
 	default: return;
 	}
 
 	printf("Bin:\n");
 
 	switch (val.type) {
-	case S8  : case U8  : print_8(val.u8,   hl.u8);   break;
-	case S16 : case U16 : print_16(val.u16, hl.u16); break;
-	case S32 : case U32 : print_32(val.u32, hl.u32); break;
-	case S64 : case U64 : print_64(val.u64, hl.u64); break;
+	case U8  : print_8(val.u8,   hl.u8);   break;
+	case U16 : print_16(val.u16, hl.u16); break;
+	case U32 : print_32(val.u32, hl.u32); break;
+	case U64 : print_64(val.u64, hl.u64); break;
 	default: return;
 	}
 }
@@ -242,7 +236,11 @@ int tobin_main(int argc, char *argv[])
 		tobin_help();
 		goto end;
 	}
-	default_initval_type = parse_intval_type(opts_type);
+	default_intval_type = parse_intval_type(opts_type);
+	if (default_intval_type == INVAL) {
+		ret = 1;
+		goto end;
+	}
 
 	result = calloc(argc, sizeof(struct intval));
 	for (i = 0; i < argc; i++) {
@@ -279,13 +277,9 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"It works only with integer data types.\n"
 			"Supported operators: +, -, /, %, <<, >>, (, )\n"
 			"Supported types:\n"
-			"  s8  - signed   8-bit\n"
 			"  u8  - unsigned 8-bit\n"
-			"  s16 - signed   16-bit\n"
 			"  u16 - unsigned 16-bit\n"
-			"  s32 - signed   32-bit\n"
 			"  u32 - unsigned 32-bit\n"
-			"  s64 - signed   64-bit\n"
 			"  u64 - unsigned 64-bit\n"
 			"Data type for each used value can be specified in () right before the value\n"
 			"itself.\n"

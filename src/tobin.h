@@ -5,20 +5,16 @@
 
 
 struct intval {
-	enum intval_type { INVAL = 0, S8, U8, S16, U16, S32, U32, S64, U64 } type;
+	enum intval_type { INVAL = 0, U8, U16, U32, U64 } type;
 	union {
-		s8_t  s8;
 		u8_t  u8;
-		s16_t s16;
 		u16_t u16;
-		s32_t s32;
 		u32_t u32;
-		s64_t s64;
 		u64_t u64;
 	};
 };
 
-extern enum intval_type default_initval_type;
+extern enum intval_type default_intval_type;
 
 enum operator { PLUS, MINUS, MULT, DIV, REST, SHIFT_L, SHIFT_R, NEG,
 				AND, XOR, OR, PAR_L, PAR_R };

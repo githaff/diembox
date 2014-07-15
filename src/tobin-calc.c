@@ -75,11 +75,19 @@ void print_symbol(struct symbol *s)
 {
 	if (s == NULL)
 		dbg_msg("-null-");
-	if (s->type == INTVAL)
-		/* TODO: fix for other integer types */
-		dbg_msg("%d", s->val.s32);
+	if (s->type == INTVAL) {
+		switch (s->val.type) {
+		case U8  : dbg_msg("%d", s->val.u8);   break;
+		case U16 : dbg_msg("%d", s->val.u16);  break;
+		case U32 : dbg_msg("%d", s->val.u32);  break;
+		case U64 : dbg_msg("%ld", s->val.u64); break;
+		default  : dbg_msg("-invalid-value-"); break;
+		}
+	}
 	else if (s->type == OPERATOR)
 		dbg_msg("%s", ops[s->op].str);
+	else
+		dbg_msg("-invalid-symbol-");
 }
 
 void print_token(char *token)
@@ -243,7 +251,7 @@ int strcmp_part(char **whole_orig, char *part)
 enum intval_type extract_intstr(char **str_orig, char *buf)
 {
 	char *str = *str_orig;
-	enum intval_type type = default_initval_type;
+	enum intval_type type = default_intval_type;
 	int len = 0;
 
 	if (*str == '-') {
@@ -288,13 +296,9 @@ int read_val(char *valstr, struct symbol *s)
 		return 0;
 
 	switch (s->val.type) {
-	case S8  : s->val.s8  = strtoll(valstr, &endptr, 0); break;
 	case U8  : s->val.u8  = strtoll(valstr, &endptr, 0); break;
-	case S16 : s->val.s16 = strtoll(valstr, &endptr, 0); break;
 	case U16 : s->val.u16 = strtoll(valstr, &endptr, 0); break;
-	case S32 : s->val.s32 = strtoll(valstr, &endptr, 0); break;
 	case U32 : s->val.u32 = strtoll(valstr, &endptr, 0); break;
-	case S64 : s->val.s64 = strtoll(valstr, &endptr, 0); break;
 	case U64 : s->val.u64 = strtoll(valstr, &endptr, 0); break;
 	default : break;
 	}
@@ -434,20 +438,16 @@ struct symbol *symbol_clone(struct symbol *s)
 }
 
 #define S_INT(S)								\
-	((S->val.type == S8)  ? S->val.s8  :		\
-	 (S->val.type == U8)  ? S->val.u8  :		\
-	 (S->val.type == S16) ? S->val.s16 :		\
+	((S->val.type == U8)  ? S->val.u8  :		\
 	 (S->val.type == U16) ? S->val.u16 :		\
-	 (S->val.type == S32) ? S->val.s32 :		\
 	 (S->val.type == U32) ? S->val.u32 :		\
-	 (S->val.type == S64) ? S->val.s64 :		\
 	 (S->val.type == U64) ? S->val.u64 : 0)
 #define S_OP_BIN(S1, S2, OP)					\
-	S1->val.type = default_initval_type;		\
-	S1->val.s64 = ((S_INT(S2)) OP (S_INT(S1)))
-#define S_OP_UNO(S1, OP)				\
-	S1->val.type = default_initval_type;		\
-	S1->val.s64 = (OP (S_INT(S1)))
+	S1->val.type = default_intval_type;			\
+	S1->val.u64 = ((S_INT(S2)) OP (S_INT(S1)))
+#define S_OP_UNO(S1, OP)						\
+	S1->val.type = default_intval_type;			\
+	S1->val.u64 = (OP (S_INT(S1)))
 #define S_OP_TYP(S1, TYPE, TYPE_ID)				\
 	S1->val.type = TYPE_ID;						\
 	S1->val.TYPE = (TYPE##_t)(S_INT(S1))
@@ -495,7 +495,9 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 				case AND     : S_OP_BIN(s1, s2, &);  break;
 				case XOR     : S_OP_BIN(s1, s2, ^);  break;
 				case OR      : S_OP_BIN(s1, s2, |);  break;
-				default      : s->val.s32 = -1;      break;
+				default      :
+					dbg_msg("invalid operation");
+					goto err_s;
 				}
 				symbol_destroy(s2);
 			}
