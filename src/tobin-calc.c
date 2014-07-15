@@ -305,15 +305,24 @@ int read_val(char *valstr, struct symbol *s)
 		goto end;
 	}
 
-	if (strstr(valstr, "0x") == valstr)
+	if (strstr(valstr, "0x") == valstr) {
 		len = strlen(valstr);
 
-	if (type == S8 && (tmp > CHAR_MAX || len > 4))
-		type = S16;
-	if (type == S16 && (tmp > SHRT_MAX || len > 6))
-		type = S32;
-	if (type == S32 && (tmp > INT_MAX || len > 10))
-		type = S64;
+		if (type == S8 && (tmp > UCHAR_MAX || len > 4))
+			type = S16;
+		if (type == S16 && (tmp > USHRT_MAX || len > 6))
+			type = S32;
+		if (type == S32 && (tmp > UINT_MAX || len > 10))
+			type = S64;
+	} else {
+		if (type == S8 && tmp > CHAR_MAX)
+			type = S16;
+		if (type == S16 && tmp > SHRT_MAX)
+			type = S32;
+		if (type == S32 && tmp > INT_MAX)
+			type = S64;
+	}
+
 	s->val.type = type;
 
 	INTVAL_SET(s->val, tmp);
