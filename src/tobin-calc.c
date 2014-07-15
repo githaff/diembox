@@ -293,6 +293,7 @@ int read_val(char *valstr, struct symbol *s)
 	int ret = 1;
 	char *endptr;
 	u64_t tmp;
+	int len = 0;
 	enum intval_type type = s->val.type;
 
 	if (s->type != INTVAL)
@@ -304,11 +305,14 @@ int read_val(char *valstr, struct symbol *s)
 		goto end;
 	}
 
-	if (type == U8 && tmp > UCHAR_MAX)
+	if (strstr(valstr, "0x") == valstr)
+		len = strlen(valstr);
+
+	if (type == U8 && (tmp > UCHAR_MAX || len > 4))
 		type = U16;
-	if (type == U16 && tmp > USHRT_MAX)
+	if (type == U16 && (tmp > USHRT_MAX || len > 6))
 		type = U32;
-	if (type == U32 && tmp > UINT_MAX)
+	if (type == U32 && (tmp > UINT_MAX || len > 10))
 		type = U64;
 	s->val.type = type;
 
