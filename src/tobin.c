@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <extopts/extopts.h>
 #include <extopts/extmods.h>
 
@@ -16,6 +17,8 @@ int opts_common;
 int opts_help;
 int opts_type;
 int opts_list;
+
+const int horiz_print_distance = 4;
 
 struct extopt tobin_opts[] = {
 	{
@@ -110,6 +113,24 @@ char *byte_str(s8_t byte, s8_t byte_hl)
 	return str;
 }
 
+void get_print_size(int size, int *w_out, int *h_out)
+{
+	int w, h;
+
+	switch (size) {
+	case 8  : w = 9;  h = 4; break;
+	case 16 : w = 20; h = 4; break;
+	case 32 : w = 20; h = 6; break;
+	case 64 : w = 20; h = 10; break;
+	default : w = 0;  h = 0; break;
+	}
+
+	if (w_out)
+		*w_out = w;
+	if (h_out)
+		*h_out = h;
+}
+
 void print_8(s8_t val, s8_t hl)
 {
 	puts("7       0");
@@ -199,6 +220,8 @@ void print_result(struct intval *res, int size, enum output_type type)
 	struct intval tmp;
 	struct intval diff;
 	struct intval hl;
+	struct winsize w;
+	int total_width;
 	int i, j;
 
 	diff.s64 = 0;
@@ -222,7 +245,17 @@ void print_result(struct intval *res, int size, enum output_type type)
 		break;
 	}
 
-	if (opts_list || size == 1) {
+	total_width = 0;
+	for (i = 0; i < size; i++) {
+		int w;
+		get_print_size(size, &w, NULL);
+		total_width += w;
+	}
+	total_width += (size - 1) * horiz_print_distance;
+
+	ioctl(0, TIOCGWINSZ, &w);
+
+	if (opts_list || size == 1 || total_width > w.ws_col) {
 		for (i = 0; i < size; i++) {
 			if (i)
 				printf("\n");
