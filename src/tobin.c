@@ -222,7 +222,7 @@ void print_result(struct intval *res, int size, enum output_type type)
 		break;
 	}
 
-	if (opts_list) {
+	if (opts_list || size == 1) {
 		for (i = 0; i < size; i++) {
 			if (i)
 				printf("\n");
