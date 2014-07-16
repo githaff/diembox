@@ -214,6 +214,22 @@ void print_intval(struct intval val, struct intval hl)
 	}
 }
 
+void print_vert(struct intval *res, int size, struct intval hl)
+{
+	int i;
+
+	for (i = 0; i < size; i++) {
+		if (i)
+			printf("\n");
+
+		print_intval(res[i], hl);
+	}
+}
+
+void print_horiz(struct intval *res, int size, struct intval hl)
+{
+	/* TODO: To Be Implemented */
+}
 
 void print_result(struct intval *res, int size, enum output_type type)
 {
@@ -255,16 +271,10 @@ void print_result(struct intval *res, int size, enum output_type type)
 
 	ioctl(0, TIOCGWINSZ, &w);
 
-	if (opts_list || size == 1 || total_width > w.ws_col) {
-		for (i = 0; i < size; i++) {
-			if (i)
-				printf("\n");
-
-			print_intval(res[i], hl);
-		}
-	} else {
-		/* TODO: To Be Implemented */
-	}
+	if (opts_list || size == 1 || total_width > w.ws_col)
+		print_vert(res, size, hl);
+	else
+		print_horiz(res, size, hl);
 }
 
 
