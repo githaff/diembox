@@ -200,7 +200,7 @@ char *linestr_64(u8_t *bytes, u8_t *bytes_hl, int line)
 
 	switch (line) {
 	case 0 : sprintf(str, "Dec: %ld",     val);		break;
-	case 1 : sprintf(str, "Hex: 0x%16lx", val);		break;
+	case 1 : sprintf(str, "Hex: 0x%016lx", val);		break;
 	case 2 : sprintf(str, "Bin:");					break;
 	case 3 : sprintf(str, "63     56  55     48");	break;
 	case 4 :
