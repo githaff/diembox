@@ -1,3 +1,17 @@
+### Normal rules
+*.o
+*.o.*
+*.a
+*.s
+*.so
+*.so.dbg
+*.gz
+*.bz2
+*.lzma
+*.xz
+*.lz4
+*.lzo
+*.patch
 ### Project build results
 config.h
 /build
