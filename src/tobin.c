@@ -227,27 +227,29 @@ char *linestr_64(u8_t *bytes, u8_t *bytes_hl, int line)
 	return str;
 }
 
+char *linestr(struct intval val, struct intval hl, int line)
+{
+	switch (val.type) {
+	case S8  : return linestr_8((u8_t*)&val.s64,  (u8_t*)&hl.s64, line);
+	case S16 : return linestr_16((u8_t*)&val.s64, (u8_t*)&hl.s64, line);
+	case S32 : return linestr_32((u8_t*)&val.s64, (u8_t*)&hl.s64, line);
+	case S64 : return linestr_64((u8_t*)&val.s64, (u8_t*)&hl.s64, line);
+	default: return NULL;
+	}
+}
+
 /*
  * Print intval regarding its type.
  * hl - mask for bits needed to be highlighted
  */
 void print_intval(struct intval val, struct intval hl)
 {
-	char *(*linefunc)(u8_t *, u8_t *, int);
 	int h;
 	int i;
 
-	switch (val.type) {
-	case S8  : linefunc = linestr_8;  break;
-	case S16 : linefunc = linestr_16; break;
-	case S32 : linefunc = linestr_32; break;
-	case S64 : linefunc = linestr_64; break;
-	default: return;
-	}
-
 	get_print_size(val.type, NULL, &h);
 	for (i = 0 ; i < h; i++)
-		puts(linefunc((u8_t*)&val.s64, (u8_t*)&hl.s64, i));
+		puts(linestr(val, hl, i));
 }
 
 void print_vert(struct intval *res, int size, struct intval hl)
@@ -267,8 +269,8 @@ void print_horiz(struct intval *res, int size, struct intval hl)
 	enum intval_type max_type = INTVAL;
 	int total_width;
 	int max_height = 0;
-//	int line_idx;
-	int i;
+	int idx;
+	int i, j;
 
 	total_width = 0;
 	for (i = 0; i < size; i++) {
@@ -280,15 +282,32 @@ void print_horiz(struct intval *res, int size, struct intval hl)
 		if (h > max_height)
 			max_height = h;
 	}
-/*
-	line_idx = 0;
-	while (line_idx < max_height) {
+
+	for (idx = 0; idx < max_height; idx++) {
+		int rest_spaces = 0;
+
 		for (i = 0; i < size; i++) {
+			int line;
 			int w, h;
+
 			get_print_size(res[i].type, &w, &h);
+			line = h + idx - max_height;
+
+			if (line < 0) {
+				rest_spaces += w + horiz_print_distance;
+			} else {
+				char *str;
+				for (j = 0; j < rest_spaces; j++)
+					printf(" ");
+
+				str = linestr(res[i], hl, line);
+				rest_spaces = w - strlen(str) + horiz_print_distance;
+				printf("%s", str);
+			}
 		}
-		}
-*/
+
+		printf("\n");
+	}
 }
 
 void print_result(struct intval *res, int size, enum output_type type)
