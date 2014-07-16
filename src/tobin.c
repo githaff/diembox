@@ -228,7 +228,31 @@ void print_vert(struct intval *res, int size, struct intval hl)
 
 void print_horiz(struct intval *res, int size, struct intval hl)
 {
-	/* TODO: To Be Implemented */
+	enum intval_type max_type = INTVAL;
+	int total_width;
+	int max_height = 0;
+//	int line_idx;
+	int i;
+
+	total_width = 0;
+	for (i = 0; i < size; i++) {
+		int w, h;
+		get_print_size(res[i].type, &w, &h);
+		total_width += w;
+		if (res[i].type > max_type)
+			max_type = res[i].type;
+		if (h > max_height)
+			max_height = h;
+	}
+/*
+	line_idx = 0;
+	while (line_idx < max_height) {
+		for (i = 0; i < size; i++) {
+			int w, h;
+			get_print_size(res[i].type, &w, &h);
+		}
+		}
+*/
 }
 
 void print_result(struct intval *res, int size, enum output_type type)
