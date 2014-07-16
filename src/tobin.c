@@ -291,9 +291,13 @@ void print_horiz(struct intval *res, int size, struct intval hl)
 			int w, h;
 
 			get_print_size(res[i].type, &w, &h);
-			line = h + idx - max_height;
 
-			if (line < 0) {
+			if (idx < 3)
+				line = idx;
+			else
+				line = h + idx - max_height;
+
+			if (idx >= 3 && line < 3) {
 				rest_spaces += w + horiz_print_distance;
 			} else {
 				char *str;
