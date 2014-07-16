@@ -11,10 +11,11 @@ cmake_install.cmake
 Makefile
 ### Emacs temporary files
 \#*#
-### Misc
-*~
 ### Generated files
 # generated distros
 /_CPack_Packages
 /embox-*
 .version
+### Misc
+tobin
+*~
