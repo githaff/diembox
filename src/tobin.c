@@ -10,6 +10,7 @@
 
 
 enum intval_type intval_type;
+enum intval_type intval_type_forced = INVAL;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
 int opts_diff;
@@ -358,6 +359,9 @@ int tobin_main(int argc, char *argv[])
 			goto end;
 		}
 
+		if (opts_type)
+			intval_type_forced = intval_type;
+
 		result[i] = eval(argv[i]);
 		if (result[i].type == INVAL) {
 			ret = 1;
@@ -370,6 +374,11 @@ int tobin_main(int argc, char *argv[])
 		print_type = OUTPUT_COMMON;
 	if (opts_diff)
 		print_type = OUTPUT_DIFF;
+
+	if (intval_type_forced) {
+		for (i = 0; i < argc; i++)
+			result[i].type = intval_type_forced;
+	}
 
 	print_result(result, argc, print_type);
 
