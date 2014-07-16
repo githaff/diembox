@@ -88,7 +88,25 @@ err:
 	return result;
 }
 
-char *byte_str(s8_t byte, s8_t byte_hl)
+void get_print_size(enum intval_type type, int *w_out, int *h_out)
+{
+	int w, h;
+
+	switch (type) {
+	case S8  : w = 9;  h = 5; break;
+	case S16 : w = 20; h = 5; break;
+	case S32 : w = 20; h = 7; break;
+	case S64 : w = 20; h = 11; break;
+	default  : w = 0;  h = 0; break;
+	}
+
+	if (w_out)
+		*w_out = w;
+	if (h_out)
+		*h_out = h;
+}
+
+char *byte_str(u8_t byte, u8_t byte_hl)
 {
 	static char str[255];
 	int sh;
@@ -113,70 +131,99 @@ char *byte_str(s8_t byte, s8_t byte_hl)
 	return str;
 }
 
-void get_print_size(enum intval_type type, int *w_out, int *h_out)
+char *linestr_8(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	int w, h;
+	static char str[255];
+	s8_t val = *bytes;
+	s8_t hl = *bytes_hl;
 
-	switch (type) {
-	case S8  : w = 9;  h = 4; break;
-	case S16 : w = 20; h = 4; break;
-	case S32 : w = 20; h = 6; break;
-	case S64 : w = 20; h = 10; break;
-	default  : w = 0;  h = 0; break;
+	switch (line) {
+	case 0 : sprintf(str, "Dec: %d",     val);		break;
+	case 1 : sprintf(str, "Hex: 0x%02x", val);		break;
+	case 2 : sprintf(str, "Bin:");					break;
+	case 3 : sprintf(str, "7       0");				break;
+	case 4 : sprintf(str, "%s", byte_str(val, hl));	break;
 	}
 
-	if (w_out)
-		*w_out = w;
-	if (h_out)
-		*h_out = h;
+	return str;
 }
 
-void print_8(s8_t val, s8_t hl)
+char *linestr_16(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	puts("7       0");
-	printf("%s\n", byte_str(val, hl));
+	static char str[255];
+	s16_t val = *(s16_t*)bytes;
+
+	switch (line) {
+	case 0 : sprintf(str, "Dec: %d",     val);		break;
+	case 1 : sprintf(str, "Hex: 0x%04x", val);		break;
+	case 2 : sprintf(str, "Bin:");					break;
+		break;
+	case 3 : sprintf(str, "15      8  7       0");	break;
+	case 4 :
+		sprintf(str, "%s  ", byte_str(bytes[1], bytes_hl[1]));
+		strcat(str, byte_str(bytes[0], bytes_hl[0]));
+		break;
+	}
+
+	return str;
 }
 
-void print_16(s16_t val, s16_t hl)
+char *linestr_32(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	s8_t *bytes = (s8_t*)&val;
-	s8_t *bytes_hl = (s8_t*)&hl;
+	static char str[255];
+	s32_t val = *(s32_t*)bytes;
 
-	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
-	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
+	switch (line) {
+	case 0 : sprintf(str, "Dec: %d",     val);		break;
+	case 1 : sprintf(str, "Hex: 0x%08x", val);		break;
+	case 2 : sprintf(str, "Bin:");					break;
+	case 3 : sprintf(str, "31     24  23     16");	break;
+	case 4 :
+		sprintf(str, "%s  ", byte_str(bytes[3], bytes_hl[3]));
+		strcat(str, byte_str(bytes[2], bytes_hl[2]));
+		break;
+	case 5 : sprintf(str, "15      8  7       0");	break;
+	case 6 :
+		sprintf(str, "%s  ", byte_str(bytes[1], bytes_hl[1]));
+		strcat(str, byte_str(bytes[0], bytes_hl[0]));
+		break;
+	}
+
+	return str;
 }
 
-void print_32(s32_t val, s32_t hl)
+char *linestr_64(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	s8_t *bytes = (s8_t*)&val;
-	s8_t *bytes_hl = (s8_t*)&hl;
+	static char str[255];
+	s64_t val = *(s64_t*)bytes;
 
-	puts("31     24  23     16");
-	printf("%s  ", byte_str(bytes[3], bytes_hl[3]));
-	printf("%s\n", byte_str(bytes[2], bytes_hl[2]));
-	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
-	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
-}
+	switch (line) {
+	case 0 : sprintf(str, "Dec: %ld",     val);		break;
+	case 1 : sprintf(str, "Hex: 0x%16lx", val);		break;
+	case 2 : sprintf(str, "Bin:");					break;
+	case 3 : sprintf(str, "63     56  55     48");	break;
+	case 4 :
+		sprintf(str, "%s  ", byte_str(bytes[7], bytes_hl[7]));
+		strcat(str, byte_str(bytes[6], bytes_hl[6]));
+		break;
+	case 5 : sprintf(str, "47     40  39     32");	break;
+	case 6 :
+		sprintf(str, "%s  ", byte_str(bytes[5], bytes_hl[5]));
+		strcat(str, byte_str(bytes[4], bytes_hl[4]));
+		break;
+	case 7 : sprintf(str, "31     24  23     16");	break;
+	case 8 :
+		sprintf(str, "%s  ", byte_str(bytes[3], bytes_hl[3]));
+		strcat(str, byte_str(bytes[2], bytes_hl[2]));
+		break;
+	case 9  : sprintf(str, "15      8  7       0");	break;
+	case 10 :
+		sprintf(str, "%s  ", byte_str(bytes[1], bytes_hl[1]));
+		strcat(str, byte_str(bytes[0], bytes_hl[0]));
+		break;
+	}
 
-void print_64(s64_t val, s64_t hl)
-{
-	s8_t *bytes = (s8_t*)&val;
-	s8_t *bytes_hl = (s8_t*)&hl;
-
-	puts("63     56  55     48");
-	printf("%s  ", byte_str(bytes[7], bytes_hl[7]));
-	printf("%s\n", byte_str(bytes[6], bytes_hl[6]));
-	puts("47     40  39     32");
-	printf("%s  ", byte_str(bytes[5], bytes_hl[5]));
-	printf("%s\n", byte_str(bytes[4], bytes_hl[4]));
-	puts("31     24  23     16");
-	printf("%s  ", byte_str(bytes[3], bytes_hl[3]));
-	printf("%s\n", byte_str(bytes[2], bytes_hl[2]));
-	puts("15      8  7       0");
-	printf("%s  ", byte_str(bytes[1], bytes_hl[1]));
-	printf("%s\n", byte_str(bytes[0], bytes_hl[0]));
+	return str;
 }
 
 /*
@@ -185,33 +232,21 @@ void print_64(s64_t val, s64_t hl)
  */
 void print_intval(struct intval val, struct intval hl)
 {
-	switch (val.type) {
-	case S8  : printf("Dec: %d\n",  val.s8);  break;
-	case S16 : printf("Dec: %d\n",  val.s16); break;
-	case S32 : printf("Dec: %d\n",  val.s32); break;
-	case S64 : printf("Dec: %ld\n", val.s64); break;
-	default:
-		err_msg("invalid intval\n");
-		return;
-	}
+	char *(*linefunc)(u8_t *, u8_t *, int);
+	int h;
+	int i;
 
 	switch (val.type) {
-	case S8  : printf("Hex: 0x%02x\n",   val.s8);  break;
-	case S16 : printf("Hex: 0x%04x\n",   val.s16); break;
-	case S32 : printf("Hex: 0x%08x\n",   val.s32); break;
-	case S64 : printf("Hex: 0x%016lx\n", val.s64); break;
+	case S8  : linefunc = linestr_8;  break;
+	case S16 : linefunc = linestr_16; break;
+	case S32 : linefunc = linestr_32; break;
+	case S64 : linefunc = linestr_64; break;
 	default: return;
 	}
 
-	printf("Bin:\n");
-
-	switch (val.type) {
-	case S8  : print_8(val.s8,   hl.s8);   break;
-	case S16 : print_16(val.s16, hl.s16); break;
-	case S32 : print_32(val.s32, hl.s32); break;
-	case S64 : print_64(val.s64, hl.s64); break;
-	default: return;
-	}
+	get_print_size(val.type, NULL, &h);
+	for (i = 0 ; i < h; i++)
+		puts(linefunc((u8_t*)&val.s64, (u8_t*)&hl.s64, i));
 }
 
 void print_vert(struct intval *res, int size, struct intval hl)
