@@ -113,16 +113,16 @@ char *byte_str(s8_t byte, s8_t byte_hl)
 	return str;
 }
 
-void get_print_size(int size, int *w_out, int *h_out)
+void get_print_size(enum intval_type type, int *w_out, int *h_out)
 {
 	int w, h;
 
-	switch (size) {
-	case 8  : w = 9;  h = 4; break;
-	case 16 : w = 20; h = 4; break;
-	case 32 : w = 20; h = 6; break;
-	case 64 : w = 20; h = 10; break;
-	default : w = 0;  h = 0; break;
+	switch (type) {
+	case S8  : w = 9;  h = 4; break;
+	case S16 : w = 20; h = 4; break;
+	case S32 : w = 20; h = 6; break;
+	case S64 : w = 20; h = 10; break;
+	default  : w = 0;  h = 0; break;
 	}
 
 	if (w_out)
@@ -264,7 +264,7 @@ void print_result(struct intval *res, int size, enum output_type type)
 	total_width = 0;
 	for (i = 0; i < size; i++) {
 		int w;
-		get_print_size(size, &w, NULL);
+		get_print_size(res[i].type, &w, NULL);
 		total_width += w;
 	}
 	total_width += (size - 1) * horiz_print_distance;
