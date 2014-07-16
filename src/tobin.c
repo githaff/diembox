@@ -88,6 +88,29 @@ err:
 	return result;
 }
 
+int strlen_col(char *str_orig)
+{
+	int len;
+	int i;
+
+	len = strlen(str_orig);
+
+	for (i = 0; colors[i]; i++) {
+		char *str = str_orig;
+		int color_len;
+
+		color_len = strlen(colors[i]);
+		str = strstr(str, colors[i]);
+		while (str) {
+			len -= color_len;
+			str += color_len;
+			str = strstr(str, colors[i]);
+		}
+	}
+
+	return len;
+}
+
 void get_print_size(enum intval_type type, int *w_out, int *h_out)
 {
 	int w, h;
@@ -108,7 +131,7 @@ void get_print_size(enum intval_type type, int *w_out, int *h_out)
 
 char *byte_str(u8_t byte, u8_t byte_hl)
 {
-	static char str[255];
+	static char str[1024];
 	int sh;
 	int i;
 	int pos = 0;
@@ -133,7 +156,7 @@ char *byte_str(u8_t byte, u8_t byte_hl)
 
 char *linestr_8(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[255];
+	static char str[1024];
 	s8_t val = *bytes;
 	s8_t hl = *bytes_hl;
 
@@ -150,7 +173,7 @@ char *linestr_8(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_16(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[255];
+	static char str[1024];
 	s16_t val = *(s16_t*)bytes;
 
 	switch (line) {
@@ -170,7 +193,7 @@ char *linestr_16(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_32(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[255];
+	static char str[1024];
 	s32_t val = *(s32_t*)bytes;
 
 	switch (line) {
@@ -194,7 +217,7 @@ char *linestr_32(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_64(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[255];
+	static char str[1024];
 	s64_t val = *(s64_t*)bytes;
 
 	switch (line) {
@@ -304,7 +327,7 @@ void print_horiz(struct intval *res, int size, struct intval hl)
 					printf(" ");
 
 				str = linestr(res[i], hl, line);
-				rest_spaces = w - strlen(str) + horiz_print_distance;
+				rest_spaces = w - strlen_col(str) + horiz_print_distance;
 				printf("%s", str);
 			}
 		}

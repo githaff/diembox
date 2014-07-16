@@ -1,4 +1,5 @@
 set (SOURCES
+  common.c
   tobin.c
   tobin-calc.c
   cat.c

@@ -21,6 +21,8 @@ typedef uint64_t u64_t;
 #define COLOR_NONE "\033[0m"
 #define COLOR_TEXT(STR) (COLOR_BOLD STR COLOR_NONE)
 
+char *colors[16];
+
 #define err_msg(...) fprintf(stderr, "Error: " __VA_ARGS__)
 #define dbg_msg(...) fprintf(stderr, __VA_ARGS__)
 
