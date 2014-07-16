@@ -348,7 +348,9 @@ void print_result(struct intval *res, int size, enum output_type type)
 	diff.s64 = 0;
 	for (i = 0; i < size; i++) {
 		for (j = 0; j < i; j++) {
-			INTVAL_OP_BIN(tmp, res[i], res[j], ^);
+			enum intval_type min_type;
+			min_type = res[i].type < res[j].type ? res[i].type : res[j].type;
+			INTVAL_OP_BIN_T(tmp, res[i], res[j], ^, min_type);
 			diff.s64 |= tmp.s64;
 		}
 	}

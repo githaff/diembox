@@ -11,10 +11,10 @@
 	case S64 : V.s64 = VAL; break;				\
 	default : break;							\
 	}
-#define INTVAL_OP_BIN(V_OUT, V1, V2, OP)					\
+#define INTVAL_OP_BIN_T(V_OUT, V1, V2, OP, TYPE)			\
 	{														\
-		V_OUT.type = intval_type;							\
-		switch (intval_type) {								\
+		V_OUT.type = TYPE;									\
+		switch (TYPE) {										\
 		case S8  : V_OUT.s8  = (V1.s8  OP V2.s8);  break; 	\
 		case S16 : V_OUT.s16 = (V1.s16 OP V2.s16); break;	\
 		case S32 : V_OUT.s32 = (V1.s32 OP V2.s32); break;	\
@@ -25,10 +25,10 @@
 			break;											\
 		}													\
 	}
-#define INTVAL_OP_UNO(V_OUT, V1, OP)				\
+#define INTVAL_OP_UNO_T(V_OUT, V1, OP, TYPE)		\
 	{												\
-		V_OUT.type = intval_type;					\
-		switch (intval_type) {						\
+		V_OUT.type = TYPE;							\
+		switch (TYPE) {								\
 		case S8  : V_OUT.s8  = (OP V1.s8);  break;	\
 		case S16 : V_OUT.s16 = (OP V1.s16); break;	\
 		case S32 : V_OUT.s32 = (OP V1.s32); break;	\
@@ -39,6 +39,10 @@
 			break;									\
 		}											\
 	}
+#define INTVAL_OP_BIN(V_OUT, V1, V2, OP)			\
+	INTVAL_OP_BIN_T(V_OUT, V1, V2, OP, intval_type)
+#define INTVAL_OP_UNO(V_OUT, V1, OP)				\
+	INTVAL_OP_UNO_T(V_OUT, V1, OP, intval_type)
 #define S_OP_BIN(S_OUT, S1, S2, OP) INTVAL_OP_BIN(S_OUT->val, S1->val, S2->val, OP)
 #define S_OP_UNO(S_OUT, S1, OP) INTVAL_OP_UNO(S_OUT->val, S1->val, OP)
 
