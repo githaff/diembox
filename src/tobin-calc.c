@@ -509,7 +509,16 @@ struct intval rpn_eval(struct symbol_queue *rpn)
 				case PLUS    : S_OP_BIN(s1, s2, s1, +);  break;
 				case MINUS   : S_OP_BIN(s1, s2, s1, -);  break;
 				case SHIFT_L : S_OP_BIN(s1, s2, s1, <<); break;
-				case SHIFT_R : S_OP_BIN(s1, s2, s1, >>); break;
+				case SHIFT_R :
+					S_OP_BIN(s1, s2, s1, >>);
+					switch (s1->val.type) {
+					case S8  : s1->val.s8  &= 0x7f;					break;
+					case S16 : s1->val.s16 &= 0x7fff;				break;
+					case S32 : s1->val.s32 &= 0x7fffffff;			break;
+					case S64 : s1->val.s64 &= 0x7fffffffffffffff;	break;
+					default  : s1->val.s64 = 0;						break;
+					}
+					break;
 				case AND     : S_OP_BIN(s1, s2, s1, &);  break;
 				case XOR     : S_OP_BIN(s1, s2, s1, ^);  break;
 				case OR      : S_OP_BIN(s1, s2, s1, |);  break;
