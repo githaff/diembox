@@ -346,13 +346,21 @@ void print_result(struct intval *res, int size, enum output_type type)
 	int i, j;
 
 	diff.s64 = 0;
+	enum intval_type min_type;
 	for (i = 0; i < size; i++) {
 		for (j = 0; j < i; j++) {
-			enum intval_type min_type;
 			min_type = res[i].type < res[j].type ? res[i].type : res[j].type;
-			INTVAL_OP_BIN_T(tmp, res[i], res[j], ^, min_type);
+			INTVAL_OP_BIN(tmp, res[i], res[j], ^);
 			diff.s64 |= tmp.s64;
 		}
+	}
+
+	switch (min_type) {
+	case S8  : diff.s64 &= 0x00000000000000ff; 	break;
+	case S16 : diff.s64 &= 0x000000000000ffff;	break;
+	case S32 : diff.s64 &= 0x00000000ffffffff;	break;
+	case S64 : diff.s64 &= 0xffffffffffffffff;	break;
+	default : break;
 	}
 
 	switch (type) {
