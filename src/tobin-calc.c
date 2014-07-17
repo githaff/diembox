@@ -299,13 +299,13 @@ int read_val(char *valstr, struct symbol *s)
 	if (s->type != INTVAL)
 		return 0;
 
-	tmp = strtoll(valstr, &endptr, 0);
-	if (*endptr) {
-		ret = 0;
-		goto end;
-	}
-
 	if (strstr(valstr, "0x") == valstr) {
+		tmp = strtoull(valstr, &endptr, 0);
+		if (*endptr) {
+			ret = 0;
+			goto end;
+		}
+
 		len = strlen(valstr);
 		if (type == S8 && (tmp > UCHAR_MAX || len > 4))
 			type = S16;
@@ -314,6 +314,12 @@ int read_val(char *valstr, struct symbol *s)
 		if (type == S32 && (tmp > UINT_MAX || len > 10))
 			type = S64;
 	} else {
+		tmp = strtoll(valstr, &endptr, 0);
+		if (*endptr) {
+			ret = 0;
+			goto end;
+		}
+
 		if (type == S8 && tmp > CHAR_MAX)
 			type = S16;
 		if (type == S16 && tmp > SHRT_MAX)
