@@ -31,8 +31,8 @@ void embox_version(void)
 	printf("Embox utilities toolset %s\n", EMBOX_VERSION_FULL);
 }
 
-int opts_help;
-int opts_version;
+bool opts_help;
+bool opts_version;
 
 struct extopt embox_opts[] = {
 	EXTOPTS_HELP(&opts_help),

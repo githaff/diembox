@@ -12,11 +12,11 @@
 enum intval_type intval_type;
 enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 
-int opts_diff;
-int opts_common;
-int opts_help;
+bool opts_diff;
+bool opts_common;
+bool opts_help;
+bool opts_list;
 int opts_type;
-int opts_list;
 
 const int horiz_print_distance = 4;
 
