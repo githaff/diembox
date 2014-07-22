@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "tobin.h"
+#include "config.h"
 
 
 enum intval_type intval_type;
@@ -15,6 +16,7 @@ enum output_type { OUTPUT_NORM = 0, OUTPUT_COMMON, OUTPUT_DIFF };
 bool opts_diff;
 bool opts_common;
 bool opts_help;
+bool opts_version;
 bool opts_list;
 int opts_type;
 
@@ -43,6 +45,7 @@ struct extopt tobin_opts[] = {
 		"8, 16, 32, 64 are supported. 32 is default.",
 	},
 	EXTOPTS_HELP(&opts_help),
+	EXTOPTS_VERSION(&opts_version),
 	EXTOPTS_END
 };
 
@@ -51,6 +54,11 @@ void tobin_help(void)
 	extmod_print_desc(extmod);
 	printf("Options:\n");
 	extmod_print_opts(extmod);
+}
+
+void tobin_version(void)
+{
+	printf("Tobin utility from embox toolset %s\n", EMBOX_VERSION_FULL);
 }
 
 enum intval_type get_intval_type(int size)
@@ -403,6 +411,10 @@ int tobin_main(int argc, char *argv[])
 	ret = extopts_get(&argc, argv, tobin_opts);
 	if (opts_help) {
 		tobin_help();
+		goto end;
+	}
+	if (opts_version) {
+		tobin_version();
 		goto end;
 	}
 
