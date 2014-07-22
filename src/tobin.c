@@ -354,7 +354,7 @@ void print_result(struct intval *res, int size, enum output_type type)
 	int i, j;
 
 	diff.s64 = 0;
-	enum intval_type min_type;
+	enum intval_type min_type = INVAL;
 	for (i = 0; i < size; i++) {
 		for (j = 0; j < i; j++) {
 			min_type = res[i].type < res[j].type ? res[i].type : res[j].type;

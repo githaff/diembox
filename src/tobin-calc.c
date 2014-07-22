@@ -389,7 +389,7 @@ struct symbol_queue *expr_parse(char *str)
 	struct symbol_queue *out;
 	struct symbol_stack *stack;
 	struct symbol *s;
-	struct symbol *top;
+	struct symbol *top = NULL;
 	enum intval_type max_type = intval_type;
 
 	out   = symbol_queue_create();
@@ -419,7 +419,7 @@ struct symbol_queue *expr_parse(char *str)
 					else
 						symbol_queue_add(out, top);
 				}
-				if (!stack->top && top->op != PAR_L) {
+				if (!stack->top && top && top->op != PAR_L) {
 					err_msg("no opening parentheses found\n");
 					goto err;
 				}
@@ -479,7 +479,7 @@ struct symbol *symbol_clone(struct symbol *s)
 struct intval rpn_eval(struct symbol_queue *rpn)
 {
 	struct symbol *s, *s_new;
-	struct symbol *s1, *s2;
+	struct symbol *s1, *s2 = NULL;
 	struct symbol_stack *stack;
 	struct intval intval;
 
