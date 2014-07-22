@@ -463,6 +463,9 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"itself.\n"
 			"\n"
 			"Examples:\n"
-			"$ embox-tobin 0xee488f120\n"
-			"$ embox-tobin \"4 + 8 << (2 - 1)\"\n"
-			"$ embox-tobin 0x52ea \"(0x18 << 5) + 0x8937ffee\"")
+			"embox tobin 0xee488f10\n"
+			"embox tobin 0x00000000ee488f10\n"
+			"embox tobin 0x00001fde 0x1242 0xdeadbeef\n"
+			"embox tobin --diff 0x23 0xee48f120 0x4fd1\n"
+			"embox tobin \"4 + 8 << (2 - 1)\"\n"
+			"embox tobin 0x52ea \"(0x18 << 5) + 0x8937ffee\"")
