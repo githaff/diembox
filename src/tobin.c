@@ -52,8 +52,6 @@ struct extopt tobin_opts[] = {
 void tobin_help(void)
 {
 	extmod_print_desc(extmod);
-	printf("Options:\n");
-	extmod_print_opts(extmod);
 }
 
 void tobin_version(void)
