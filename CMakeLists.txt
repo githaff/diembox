@@ -12,9 +12,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
 ### Project directories
 ## CMake modules
 set (CMAKE_MODULE_PATH "cmake")
-## Sources
-set (SRC_DIR "${CMAKE_SOURCE_DIR}/src")
-## Build product directories
+set (SOURCES_DIR "${CMAKE_SOURCE_DIR}/src")
 set (BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
 if (NOT EXISTS "${BUILD_DIR}")
   file (MAKE_DIRECTORY "${BUILD_DIR}")
@@ -25,7 +23,7 @@ if (NOT DEFINED CMAKE_INSTALL_BINDIR)
   set (CMAKE_INSTALL_BINDIR "bin")
 endif (NOT DEFINED CMAKE_INSTALL_BINDIR)
 
-add_subdirectory (${SRC_DIR})
+add_subdirectory (${SOURCES_DIR})
 
 ### Determine package version
 include (git-ver)
