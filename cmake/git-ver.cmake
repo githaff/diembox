@@ -1,4 +1,4 @@
-### Version control policy
+### Vetrrsion control policy
 ###
 ### Extract current version from version control if present.  If
 ### source is not under source control - take from .version
@@ -7,7 +7,9 @@
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
   execute_process (COMMAND git describe
     OUTPUT_VARIABLE GIT_TAG_VERSION)
-  file (WRITE .version "${GIT_TAG_VERSION}")
+  if (GIT_TAG_VERSION)
+    file (WRITE .version "${GIT_TAG_VERSION}")
+  endif ()
 else ()
   if (EXISTS "${CMAKE_SOURCE_DIR}/.version")
     execute_process (COMMAND cat .version
@@ -15,7 +17,7 @@ else ()
   endif ()
 endif ()
 ## Parse version
-if ("${GIT_TAG_VERSION}" STREQUAL "")
+if (NOT GIT_TAG_VERSION)
   message (WARNING "No version information was found! "
     "Package should be built from correct source tree.")
   set (EMBOX_VERSION_MAJOR 0)
@@ -37,10 +39,10 @@ else ()
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   set (EMBOX_VERSION "${EMBOX_VERSION_MAJOR}.${EMBOX_VERSION_MINOR}")
-  if (EMBOX_VERSION_DIRT STREQUAL "")
-    set (EMBOX_VERSION_FULL "${EMBOX_VERSION}")
-  else ()
+  if (EMBOX_VERSION_DIRT)
     set (EMBOX_VERSION_FULL "${EMBOX_VERSION}-${EMBOX_VERSION_DIRT}")
+  else ()
+    set (EMBOX_VERSION_FULL "${EMBOX_VERSION}")
   endif ()
   
   message (STATUS "Building version: ${EMBOX_VERSION_FULL}")
