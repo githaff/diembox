@@ -1,6 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
 
-
 ### Name of whole complex
 set (PROJECT "embox")
 project (${PROJECT})
@@ -10,55 +9,13 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -O0 -g3 -ggdb")
 # Set additional warnings
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
 
-### Extract current version from version control if present.
-### If not - take from .version file
-if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  execute_process (COMMAND git describe
-    OUTPUT_VARIABLE GIT_TAG_VERSION)
-  file (WRITE .version "${GIT_TAG_VERSION}")
-else ()
-  if (EXISTS "${CMAKE_SOURCE_DIR}/.version")
-    execute_process (COMMAND cat .version
-      OUTPUT_VARIABLE GIT_TAG_VERSION)
-  endif ()
-endif ()
-## Parse version
-if ("${GIT_TAG_VERSION}" STREQUAL "")
-  message (WARNING "No version information was found! "
-    "Package should be built from correct source tree.")
-  set (EMBOX_VERSION_MAJOR 0)
-  set (EMBOX_VERSION_MINOR 0)
-  set (EMBOX_VERSION "0.0")
-  set (EMBOX_VERSION_FULL "unknown")
-else ()
-  execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/^v\\([[:digit:]]*\\)\\..*/\\1/p"
-    OUTPUT_VARIABLE EMBOX_VERSION_MAJOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/^v[[:digit:]]*\\.\\([[:digit:]]*\\).*/\\1/p"
-    OUTPUT_VARIABLE EMBOX_VERSION_MINOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process (COMMAND echo "${GIT_TAG_VERSION}"
-    COMMAND sed -ne "s/.*-\\(.*\\)/\\1/p"
-    OUTPUT_VARIABLE EMBOX_VERSION_DIRT
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-  set (EMBOX_VERSION "${EMBOX_VERSION_MAJOR}.${EMBOX_VERSION_MINOR}")
-  if (EMBOX_VERSION_DIRT STREQUAL "")
-    set (EMBOX_VERSION_FULL "${EMBOX_VERSION}")
-  else ()
-    set (EMBOX_VERSION_FULL "${EMBOX_VERSION}-${EMBOX_VERSION_DIRT}")
-  endif ()
-endif ()
-
-
 ### Project directories
-## Build product directories
-set (BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
+## CMake modules
+set (CMAKE_MODULE_PATH "cmake")
 ## Sources
 set (SRC_DIR "${CMAKE_SOURCE_DIR}/src")
-
+## Build product directories
+set (BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
 if (NOT EXISTS "${BUILD_DIR}")
   file (MAKE_DIRECTORY "${BUILD_DIR}")
 endif()
@@ -69,6 +26,9 @@ if (NOT DEFINED CMAKE_INSTALL_BINDIR)
 endif (NOT DEFINED CMAKE_INSTALL_BINDIR)
 
 add_subdirectory (${SRC_DIR})
+
+### Determine package version
+include (git-ver)
 
 ### Packaging setup
 include (InstallRequiredSystemLibraries)
