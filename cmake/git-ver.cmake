@@ -1,4 +1,4 @@
-### Vetrrsion control policy
+### Version control policy
 ###
 ### Extract current version from version control if present.  If
 ### source is not under source control - take from .version
