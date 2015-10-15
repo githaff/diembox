@@ -3,7 +3,7 @@
 ### Fetch submodules registered in this project for further use as
 ### subprojects
 
-function (git_fetch_submodules)
+function (git_submodules_fetch)
   ### Check if sumbodules exist at all
   if (NOT EXISTS "${PROJECT_SOURCE_DIR}/.gitmodules")
     message (WARNING "No git submodules are present in this git repository")
@@ -16,5 +16,5 @@ function (git_fetch_submodules)
     COMMAND             git submodule update --init --recursive
     WORKING_DIRECTORY   ${PROJECT_SOURCE_DIR}
     OUTPUT_QUIET)
-endfunction (git_fetch_submodules)
+endfunction (git_submodules_fetch)
 

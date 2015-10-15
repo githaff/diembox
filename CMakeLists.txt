@@ -26,11 +26,11 @@ endif (NOT DEFINED CMAKE_INSTALL_BINDIR)
 add_subdirectory (${SOURCES_DIR})
 
 ### Determine package version
-include (git-ver)
+include (git-version)
 include (git-submodules)
 
-git_extract_version ()
-git_fetch_submodules ()
+git_version_extract ()
+git_submodules_fetch ()
 
 ### Packaging setup
 include (InstallRequiredSystemLibraries)

@@ -4,7 +4,7 @@
 ### source is not under source control - take from .version
 ### file. Otherwise current version is 0.0
 
-function (git_extract_version)
+function (git_version_extract)
   ### Extract version string
   if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process (COMMAND git describe
@@ -50,4 +50,4 @@ function (git_extract_version)
     
     message (STATUS "Building version: ${EMBOX_VERSION_FULL}")
   endif ()
-endfunction (git_extract_version)
+endfunction (git_version_extract)
