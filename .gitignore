@@ -28,6 +28,7 @@ Makefile
 
 ### Emacs temporary files
 \#*#
+.#*
 
 ### Generated files
 # generated distros
