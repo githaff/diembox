@@ -29,6 +29,7 @@ add_subdirectory (${SOURCES_DIR})
 include (git-ver)
 include (git-submodules)
 
+git_extract_version ()
 git_fetch_submodules ()
 
 ### Packaging setup
