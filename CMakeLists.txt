@@ -27,10 +27,8 @@ add_subdirectory (${SOURCES_DIR})
 
 ### Determine package version
 include (git-version)
-include (git-submodules)
 
 git_version_extract ()
-git_submodules_fetch ()
 
 ### Packaging setup
 include (InstallRequiredSystemLibraries)
