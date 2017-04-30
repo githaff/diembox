@@ -11,24 +11,20 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
 
 ### Project directories
 ## CMake modules
-set (CMAKE_MODULE_PATH "cmake")
+## CMake modules
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set (SOURCES_DIR "${CMAKE_SOURCE_DIR}/src")
-set (BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
-if (NOT EXISTS "${BUILD_DIR}")
-  file (MAKE_DIRECTORY "${BUILD_DIR}")
-endif()
 
 ## Installation paths if not specified
 if (NOT DEFINED CMAKE_INSTALL_BINDIR)
   set (CMAKE_INSTALL_BINDIR "bin")
 endif (NOT DEFINED CMAKE_INSTALL_BINDIR)
 
-add_subdirectory (${SOURCES_DIR})
-
-### Determine package version
+### Extract version numbers
 include (git-version)
+git_version_extract (EMBOX)
 
-git_version_extract ()
+add_subdirectory (${SOURCES_DIR})
 
 ### Packaging setup
 include (InstallRequiredSystemLibraries)
@@ -46,7 +42,6 @@ set (CPACK_SOURCE_IGNORE_FILES
   "#.*#"
   ".*.tar.gz"
   "/.git"
-  "/build"
   "/_CPack_Packages"
   ".gitignore"
   "CMakeCache.txt"

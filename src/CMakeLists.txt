@@ -17,11 +17,14 @@ add_executable (${PROJECT}
 
 set_target_properties (${PROJECT}
   PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
+  OUTPUT_NAME ${PROJECT}
+  VERSION "${EMBOX_VERSION}")
 
 find_package (extopts)
-include_directories(${EXTOPTS_INCLUDE_DIR})
-target_link_libraries (${PROJECT} ${EXTOPTS_LIBRARY})
+include_directories (
+  ${EXTOPTS_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries (${PROJECT} ${EXTOPTS_LIBRARY_STATIC})
 
 ### Install rules
 install (TARGETS ${PROJECT} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
