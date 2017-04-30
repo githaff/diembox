@@ -17,8 +17,7 @@ add_executable (${PROJECT}
 
 set_target_properties (${PROJECT}
   PROPERTIES
-  OUTPUT_NAME ${PROJECT}
-  VERSION "${EMBOX_VERSION}")
+  OUTPUT_NAME ${PROJECT})
 
 find_package (extopts)
 include_directories (
