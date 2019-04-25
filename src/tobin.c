@@ -180,7 +180,7 @@ char *linestr_8(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_16(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[1024];
+	static char str[1026];
 	s16_t val = *(s16_t*)bytes;
 
 	switch (line) {
@@ -200,7 +200,7 @@ char *linestr_16(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_32(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[1024];
+	static char str[1026];
 	s32_t val = *(s32_t*)bytes;
 
 	switch (line) {
@@ -224,7 +224,7 @@ char *linestr_32(u8_t *bytes, u8_t *bytes_hl, int line)
 
 char *linestr_64(u8_t *bytes, u8_t *bytes_hl, int line)
 {
-	static char str[1024];
+	static char str[1026];
 	s64_t val = *(s64_t*)bytes;
 
 	switch (line) {
