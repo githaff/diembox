@@ -32,7 +32,7 @@ int help_module(int argc, char *argv[])
 	int ret = 0;
 
 	if (argc <= 1) {
-		embox_usage();
+		diembox_usage();
 		goto end;
 	}
 
@@ -65,6 +65,6 @@ end:
 
 EXTMOD_DECL(help, help_module, NULL,
 			"Print help",
-			"Usage: embox help [COMMAND]\n"
+			"Usage: diembox help [COMMAND]\n"
 			"Print help on specified command. If no command is specified print\n"
-			"common embox help.")
+			"common diembox help.")

@@ -5,9 +5,9 @@
 #include <extopts/extopts.h>
 
 
-extern struct extopt embox_opts[];
-extern char embox_name[];
-void embox_usage();
+extern struct extopt diembox_opts[];
+extern char diembox_name[];
+void diembox_usage();
 
 
 #endif /* __MAIN_INFO_H */

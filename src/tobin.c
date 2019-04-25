@@ -57,7 +57,7 @@ void tobin_help(void)
 
 void tobin_version(void)
 {
-	printf("Tobin utility from embox toolset %s\n", EMBOX_VERSION_FULL);
+	printf("Tobin utility from diembox toolset %s\n", EMBOX_VERSION_FULL);
 }
 
 enum intval_type get_intval_type(int size)
@@ -449,7 +449,7 @@ end:
 
 EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"Binary calculator",
-			"Usage: embox-tobin [OPTION]... EXPRESSION\n"
+			"Usage: diembox tobin [OPTION]... EXPRESSION\n"
 			"This utility implements basic binary calculator functions with central ability\n"
 			"to output result of expression in readable binary form.\n"
 			"\n"
@@ -462,9 +462,9 @@ EXTMOD_DECL(tobin, tobin_main, tobin_opts,
 			"itself.\n"
 			"\n"
 			"Examples:\n"
-			"embox tobin 0xee488f10\n"
-			"embox tobin 0x00000000ee488f10\n"
-			"embox tobin 0x00001fde 0x1242 0xdeadbeef\n"
-			"embox tobin --diff 0x23 0xee48f120 0x4fd1\n"
-			"embox tobin \"4 + 8 << (2 - 1)\"\n"
-			"embox tobin 0x52ea \"(0x18 << 5) + 0x8937ffee\"")
+			"diembox tobin 0xee488f10\n"
+			"diembox tobin 0x00000000ee488f10\n"
+			"diembox tobin 0x00001fde 0x1242 0xdeadbeef\n"
+			"diembox tobin --diff 0x23 0xee48f120 0x4fd1\n"
+			"diembox tobin \"4 + 8 << (2 - 1)\"\n"
+			"diembox tobin 0x52ea \"(0x18 << 5) + 0x8937ffee\"")

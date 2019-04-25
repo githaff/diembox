@@ -8,25 +8,22 @@
 #include "main-info.h"
 
 
-char embox_name[] = "embox";
+char diembox_name[] = "diembox";
 
-void embox_usage(void)
+void diembox_usage(void)
 {
 	printf("Usage: %s [OPTIONS] COMMAND [COMMAND_OPTIONS]\n"
-		   "Embedded developer toolbox.\n"
-		   "Targeted mainly at aiding embedded low-level programming (but of course\n"
-		   "can be used by anyone) and implements basic useful tools which perfectly\n"
-		   "may be replaced by other different tools. But it is simply convenient\n"
-		   "to hold it all in one console utility.\n"
-		   "\n", embox_name);
+		   "DiEM toolbox.\n"
+		   "A set of console helper utilities.\n"
+		   "\n", diembox_name);
 	printf("Commands:\n");
 	extmods_usage_list();
 	printf("\n");
 	printf("Options:\n");
-	extopts_usage(embox_opts);
+	extopts_usage(diembox_opts);
 }
 
-void embox_version(void)
+void diembox_version(void)
 {
 	printf("Embox utilities toolset %s\n", EMBOX_VERSION_FULL);
 }
@@ -34,7 +31,7 @@ void embox_version(void)
 bool opts_help;
 bool opts_version;
 
-struct extopt embox_opts[] = {
+struct extopt diembox_opts[] = {
 	EXTOPTS_HELP(&opts_help),
 	EXTOPTS_VERSION(&opts_version),
 	EXTOPTS_END
@@ -54,22 +51,22 @@ int main(int argc, char *argv[])
 	if (module)
 		ret = extmod_exec(argc, argv, module);
 	else {
-		if (strcmp(execname, embox_name)) {
+		if (strcmp(execname, diembox_name)) {
 			fprintf(stderr, "%s: module not found\n", execname);
 			ret = 1;
 			goto err;
 		}
 
-		ret = extopts_get(&argc, argv, embox_opts);
+		ret = extopts_get(&argc, argv, diembox_opts);
 		if (ret)
 			goto err;
 
 		if (opts_help) {
-			embox_usage();
+			diembox_usage();
 			goto end;
 		}
 		if (opts_version) {
-			embox_version();
+			diembox_version();
 			goto end;
 		}
 	}

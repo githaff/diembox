@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 ### Name of whole complex
-set (PROJECT "embox")
+set (PROJECT "diembox")
 project (${PROJECT})
 
 # Set compile parameters
