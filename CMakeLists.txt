@@ -5,7 +5,7 @@ set (PROJECT "diembox")
 project (${PROJECT})
 
 # Set compile parameters
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -O0 -g3 -ggdb")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -O0 -g3 -ggdb")
 # Set additional warnings
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -pedantic")
 
@@ -37,7 +37,7 @@ set (CPACK_PACKAGE_VERSION_MINOR "${EMBOX_VERSION_MINOR}")
 set (CPACK_SOURCE_GENERATOR "TGZ")
 set (CPACK_SOURCE_PACKAGE_FILE_NAME
   "${CMAKE_PROJECT_NAME}-${EMBOX_VERSION_FULL}")
-set (CPACK_SOURCE_IGNORE_FILES 
+set (CPACK_SOURCE_IGNORE_FILES
   ".*~"
   "#.*#"
   ".*.tar.gz"
