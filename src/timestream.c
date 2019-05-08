@@ -93,6 +93,7 @@ static void print_time(int sig)
     }
 
     printf("%s\n", buf);
+    fflush(stdout);
 }
 
 int timestream_main(int argc, char *argv[])
