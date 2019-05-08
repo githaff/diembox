@@ -83,10 +83,10 @@ static void print_time(int sig)
 
     switch (time_mode) {
     case TM_SEC :
-        strftime(buf, sizeof(buf), "%H:%M", gmtime(&ts.tv_sec));
+        strftime(buf, sizeof(buf), "%H:%M", localtime(&ts.tv_sec));
         break;
     case TM_MIN :
-        strftime(buf, sizeof(buf), "%H:%M:%S", gmtime(&ts.tv_sec));
+        strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&ts.tv_sec));
         break;
     default:
         strcpy(buf, "-inval-");
